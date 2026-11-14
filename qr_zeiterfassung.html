@@ -52,16 +52,14 @@ video{width:100%;display:block;background:#000}
 </div>
 
 <div class="karta">
-  <div class="tit">📷 Skano objektin</div>
-  <div class="qrbox"><video id="video" playsinline muted></video></div>
-  <div class="rresht">
-    <button class="b-cyan" id="btn-kamera" onclick="ndizKameran()">📷 Hap kamerën</button>
-    <button class="b-gray" onclick="ndalKameran()">⏹ Mbyll</button>
-  </div>
+  <div class="tit">📋 Zgjidh objektin</div>
+  <select id="zgjedh-obj" onchange="zgjidhObjektin(this.value)">
+    <option value="">— Prek objektin —</option>
+  </select>
   <div class="st" id="st-skan"></div>
-  <label>Ose shkruaj numrin e objektit</label>
+  <label>Ose shkruaj numrin (p.sh. 1001)</label>
   <div class="rresht">
-    <input type="number" id="nr-dore" placeholder="p.sh. 1001" style="flex:2">
+    <input type="number" id="nr-dore" placeholder="1001" style="flex:2">
     <button class="b-gold" style="flex:1" onclick="filloMeNumer()">▶ Nis</button>
   </div>
 </div>
@@ -74,8 +72,10 @@ video{width:100%;display:block;background:#000}
   </div>
   <div class="rresht" style="margin-top:8px">
     <button class="b-green" onclick="eksportoCSV()">📤 Eksporto Excel</button>
-    <button class="b-gray" onclick="fshiDiten()">🗑 Fshi</button>
+    <button class="b-gray" id="btn-fshi" onclick="fshiDiten()">🗑 Fshi</button>
   </div>
+  <textarea id="eksport" class="hide" rows="7" readonly
+    style="width:100%;margin-top:10px;font-size:.7rem;font-family:monospace;background:#0d0d1a;color:#e8e8f0;border:1px solid #2a2a50;border-radius:8px;padding:8px"></textarea>
   <div class="st" id="st-lista"></div>
 </div>
 
@@ -83,7 +83,7 @@ video{width:100%;display:block;background:#000}
 var OBJEKTET = [{"nr": 1001, "name": "Reinigung wie nach Plan", "klient": "Kindertageseinrichtung Sonnenschein"}, {"nr": 1002, "name": "Röllfeld, Steigweg 1", "klient": "Gies Immobilien GmbH"}, {"nr": 1003, "name": "Wörth am Main, Galgenstr. 6", "klient": "Praxis Dr. Plattner Dr. Vogel Dr. Ide"}, {"nr": 1004, "name": "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a", "klient": "PETERS GmbH"}, {"nr": 1005, "name": "Laudenbach, Mühlweg 51", "klient": "Gies Immobilien GmbH"}, {"nr": 1006, "name": "Obernburg, Obere Wallstr. 17-19", "klient": "AB-Hausverwaltung Wolf"}, {"nr": 1007, "name": "Klingenberg, Wilhelmstr. 63", "klient": "Markus Krall"}, {"nr": 1008, "name": "Wörth am Main, Beethovenstr. 2b", "klient": "Vereinigte Schiffs-Versicherung V.A.G"}, {"nr": 1009, "name": "Wörth am Main, Frühlingsstr. 13a - 13b", "klient": "Eva Schroll"}, {"nr": 1010, "name": "Wörth am Main, Moosgraben 25", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1011, "name": "Wörth am Main, Odenwaldstr. 30", "klient": "Ulrich Möller"}, {"nr": 1012, "name": "Haibach, Ludwigstr. 11", "klient": "Dieter Zang"}, {"nr": 1013, "name": "Wörth am Main, Presentstr. 19", "klient": "algeb awell GmbH"}, {"nr": 1014, "name": "Kleinheubach, Kastellstr. 11a", "klient": "Main Immo Team GmbH"}, {"nr": 1015, "name": "Wörth am Main, Erlenstr. 9", "klient": "Ismail Sezer"}, {"nr": 1016, "name": "Kleinheubach, Jahnstr. 17", "klient": "WEG Jahnstr. 17 c/o Perfect Living"}, {"nr": 1017, "name": "Wörth am Main, Presentstr. 18", "klient": "Firma Klein Zügner Gbr c/o Eilbacher"}, {"nr": 1018, "name": "Großwallstadt, Quellenstr. 5", "klient": "Main Immo Team GmbH"}, {"nr": 1019, "name": "Wörth am Main, Landstr. 78", "klient": "Erbengemeinschaft Wolf"}, {"nr": 1020, "name": "Elsenfeld, Hoffeldstraße 39", "klient": "Main Immo Team GmbH"}, {"nr": 1021, "name": "Elsenfeld, Finkenweg 14", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1022, "name": "Elsendelf, Droselweg 17", "klient": "Immobilien Hausverwaltung Schultz GmbH"}];
 var KEY_H = 'fth_hm_hyrjet';
 var KEY_P = 'fth_hm_punetori';
-var gAktiv = null, gHyrjet = [], gStream = null, gDetektor = null, gDuke = false;
+var gHyrjet = [];
 
 function dy(v){return (v<10?'0':'')+v;}
 function oraTani(){
@@ -133,6 +133,23 @@ function ruajHyrjet(){
   te_gjitha=te_gjitha.filter(function(h){return h.data!==sot;});
   for(var i=0;i<gHyrjet.length;i++) te_gjitha.push(gHyrjet[i]);
   localStorage.setItem(KEY_H,JSON.stringify(te_gjitha));
+}
+function mbushListen(){
+  var sel=document.getElementById('zgjedh-obj');
+  var html='<option value="">— Prek objektin —</option>';
+  var sot=dataISO(), perdorur={};
+  for(var i=0;i<gHyrjet.length;i++){ if(gHyrjet[i].data===sot) perdorur[gHyrjet[i].nr]=true; }
+  for(var j=0;j<OBJEKTET.length;j++){
+    var o=OBJEKTET[j];
+    var shenja = perdorur[o.nr] ? '  ✔' : '';
+    html+='<option value="'+o.nr+'">'+o.nr+' · '+o.name+shenja+'</option>';
+  }
+  sel.innerHTML=html;
+}
+function zgjidhObjektin(v){
+  if(!v) return;
+  filloObjektin(v);
+  document.getElementById('zgjedh-obj').value='';
 }
 function vizato(){
   var el=document.getElementById('lista');
@@ -186,7 +203,7 @@ function filloObjektin(teksti){
     von:oraTani().slice(0,5), von_iso:tani.toISOString(), bis:null, minuta:0,
     punetori:document.getElementById('punetori').value
   });
-  ruajHyrjet(); vizato();
+  ruajHyrjet(); vizato(); mbushListen();
   document.getElementById('st-skan').textContent='✔ '+o.nr+' · '+o.name;
 }
 function mbyllAktivin(){
@@ -196,7 +213,7 @@ function mbyllAktivin(){
       gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
     }
   }
-  ruajHyrjet(); vizato();
+  ruajHyrjet(); vizato(); mbushListen();
 }
 function mbylleDiten(){
   mbyllAktivin();
@@ -208,67 +225,43 @@ function filloMeNumer(){
   filloObjektin(v);
   document.getElementById('nr-dore').value='';
 }
-function ndizKameran(){
-  if(gDuke) return;
-  var v=document.getElementById('video');
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    document.getElementById('st-skan').textContent='⚠ Kamera nuk mbeshtetet. Shkruaj numrin.';
-    return;
-  }
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
-  .then(function(s){
-    gStream=s; v.srcObject=s; v.play(); gDuke=true;
-    document.getElementById('st-skan').textContent='Kamera hapur - drejtoji kodin';
-    skanoVazhdimisht();
-  })
-  .catch(function(e){
-    document.getElementById('st-skan').textContent='⚠ Kamera nuk hapet: '+e.message;
-  });
-}
-function ndalKameran(){
-  if(gStream){ gStream.getTracks().forEach(function(t){t.stop();}); gStream=null; }
-  gDuke=false;
-  document.getElementById('st-skan').textContent='Kamera u mbyll';
-}
-function skanoVazhdimisht(){
-  if(!gDuke) return;
-  var v=document.getElementById('video');
-  if(!('BarcodeDetector' in window)){
-    document.getElementById('st-skan').textContent='⚠ Ky telefon s\'e lexon QR vetë. Shkruaj numrin.';
-    return;
-  }
-  if(!gDetektor){
-    gDetektor=new BarcodeDetector({formats:['qr_code']});
-  }
-  gDetektor.detect(v).then(function(list){
-    if(list && list.length){
-      var teksti=list[0].rawValue;
-      ndalKameran();
-      filloObjektin(teksti);
-      return;
-    }
-    setTimeout(skanoVazhdimisht,400);
-  }).catch(function(){ setTimeout(skanoVazhdimisht,600); });
-}
 function eksportoCSV(){
-  var r=['Datum;Objekt_Nr;Emri_Objektit;Klienti;Von;Bis;Stunden;Minuten;Mitarbeiter'];
+  if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
+  var r=['Datum\tObjekt_Nr\tEmri_Objektit\tKlienti\tVon\tBis\tStunden\tMinuten\tMitarbeiter'];
   for(var i=0;i<gHyrjet.length;i++){
     var h=gHyrjet[i];
     var m=h.bis?h.minuta:minutaTe(h.von_iso);
     r.push([h.datum,h.nr,h.emri,h.klient,h.von,h.bis||'',
-      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join(';'));
+      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join('\t'));
   }
-  var csv=r.join('\r\n');
-  var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='FTH_Hausmeister_'+dataISO()+'.csv';
-  a.click();
+  var teksti=r.join('\r\n');
+  var el=document.getElementById('eksport');
+  el.value=teksti;
+  el.classList.remove('hide');
+  document.getElementById('st-lista').textContent='Kopjo tekstin dhe ngjite ne Excel';
+  try{ el.select(); document.execCommand('copy'); document.getElementById('st-lista').textContent='✔ U kopjua! Ngjite ne Excel'; }catch(e){}
+  // provo shkarkimin (funksionon vetem ne disa telefona)
+  try{
+    var blob=new Blob(['\ufeff'+teksti],{type:'text/csv;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='FTH_Hausmeister_'+dataISO()+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }catch(e){}
 }
 function fshiDiten(){
-  if(!confirm('Fshi te gjitha hyrjet e sotme?')) return;
-  gHyrjet=[]; ruajHyrjet(); vizato();
-  document.getElementById('st-lista').textContent='U fshine';
+  var b=document.getElementById('btn-fshi');
+  if(b.dataset.bere!=='1'){
+    b.dataset.bere='1';
+    b.textContent='⚠ Prek perseri per te fshire';
+    b.style.background='#8e2b20';
+    setTimeout(function(){ b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background=''; },4000);
+    return;
+  }
+  gHyrjet=[]; ruajHyrjet(); vizato(); mbushListen();
+  var el=document.getElementById('eksport'); el.value=''; el.classList.add('hide');
+  document.getElementById('st-lista').textContent='✔ U fshine te gjitha';
+  b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background='';
 }
 function tik(){
   document.getElementById('ora-now').textContent=oraTani();
@@ -277,6 +270,7 @@ function tik(){
 }
 ngarkoPunetoret();
 merrHyrjet();
+mbushListen();
 vizato();
 setInterval(tik,1000); tik();
 </script>
