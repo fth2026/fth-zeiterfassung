@@ -65,6 +65,31 @@ video{width:100%;display:block;background:#000}
 </div>
 
 <div class="karta">
+  <div class="tit">🏠 Mungesa / Abwesenheit</div>
+  <label>Arsyeja</label>
+  <select id="ab-arsye">
+    <option>Krank (Sëmurë)</option>
+    <option>Urlaub (Pushim)</option>
+    <option>Homeoffice</option>
+    <option>Elternzeit</option>
+    <option>Arzttermin</option>
+    <option>Sonstiges (Tjetër)</option>
+  </select>
+  <label>Kohëzgjatja</label>
+  <select id="ab-dite">
+    <option>1 ditë e plotë</option>
+    <option>0.5 gjysmë dite</option>
+    <option>2 ditë</option>
+    <option>3 ditë</option>
+    <option>1 javë</option>
+  </select>
+  <label>Shënim</label>
+  <input type="text" id="ab-notiz" placeholder="Shënim i lirë...">
+  <button class="b-red" onclick="ruajMungesen()">💾 Ruaj mungesën</button>
+  <div class="st" id="st-abwes"></div>
+</div>
+
+<div class="karta">
   <div class="tit">⏱ Objektet e sotme</div>
   <div id="lista"></div>
   <div class="rresht" style="margin-top:12px">
@@ -72,6 +97,7 @@ video{width:100%;display:block;background:#000}
   </div>
   <div class="rresht" style="margin-top:8px">
     <button class="b-green" onclick="eksportoCSV()">📤 Eksporto Excel</button>
+    <button class="b-gold" onclick="eksportoJSONlaptop()">💾 Ruaj JSON (OneDrive)</button>
     <button class="b-gray" id="btn-fshi" onclick="fshiDiten()">🗑 Fshi</button>
   </div>
   <textarea id="eksport" class="hide" rows="7" readonly
@@ -166,6 +192,81 @@ function zgjidhObjektin(v){
   filloObjektin(v);
   document.getElementById('zgjedh-obj').value='';
 }
+
+function ruajMungesen(){
+  var arsye=document.getElementById('ab-arsye').value;
+  var dite=document.getElementById('ab-dite').value;
+  var notiz=document.getElementById('ab-notiz').value.trim();
+  var oreSipas={'1 ditë e plotë':8,'0.5 gjysmë dite':4,'2 ditë':16,'3 ditë':24,'1 javë':40};
+  var oreAbwes=oreSipas.hasOwnProperty(dite)?oreSipas[dite]:8;
+  var tani=new Date();
+
+  // Mbyll objektin e hapur
+  for(var j=0;j<gHyrjet.length;j++){
+    if(!gHyrjet[j].bis && !gHyrjet[j].abwesend){
+      gHyrjet[j].bis=oraTani().slice(0,5);
+      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
+    }
+  }
+
+  gHyrjet.push({
+    id: tani.getTime().toString()+Math.random().toString(36).substr(2,4),
+    data: dataISO(), datum: dataSot(),
+    mitarbeiter: document.getElementById('punetori').value,
+    abwesend: true,
+    von: '—', bis: '—', pause: '0', ore: oreAbwes,
+    nr: '', emri: '', klient: '',
+    lnr: '', bezeichnung: dite,
+    taetigkeit: 'ABWESENHEIT',
+    notiz: notiz || arsye,
+    abgrund: arsye,
+    punetori: document.getElementById('punetori').value,
+    von_iso: null, minuta: 0
+  });
+
+  ruajHyrjet(); vizato(); mbushListen();
+  var kujtesa = arsye.indexOf('Krank')>=0 ? ' · ⚠ Dërgo Krankenschein me E-Mail!' : '';
+  document.getElementById('st-abwes').textContent='✔ U regjistrua: '+arsye+' · '+dite+' ('+oreAbwes+'h)'+kujtesa;
+  document.getElementById('ab-notiz').value='';
+}
+
+function eksportoJSONlaptop(){
+  if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
+  var d=[];
+  for(var i=0;i<gHyrjet.length;i++){
+    var h=gHyrjet[i];
+    if(h.abwesend){
+      d.push({
+        id: h.id, datum: h.datum, mitarbeiter: h.mitarbeiter,
+        abwesend: true, von: '—', bis: '—', pause: '0',
+        ore: h.ore, lnr: '', bezeichnung: h.bezeichnung,
+        taetigkeit: 'ABWESENHEIT', notiz: h.notiz, abgrund: h.abgrund
+      });
+    } else {
+      var m = h.bis ? h.minuta : minutaTe(h.von_iso);
+      d.push({
+        id: h.id, datum: h.datum, mitarbeiter: h.mitarbeiter,
+        abwesend: false, von: h.von, bis: h.bis||'',
+        pause: '0', ore: Math.round(m/60*100)/100,
+        lnr: String(h.nr), bezeichnung: h.emri,
+        taetigkeit: 'Hausmeister', notiz: '', abgrund: ''
+      });
+    }
+  }
+  var teksti=JSON.stringify(d, null, 1);
+  var el=document.getElementById('eksport');
+  el.value=teksti; el.classList.remove('hide');
+  document.getElementById('st-lista').textContent='JSON gati - kopjoje ose shkarkoje';
+  try{ el.select(); document.execCommand('copy'); document.getElementById('st-lista').textContent='✔ JSON u kopjua!'; }catch(e){}
+  try{
+    var blob=new Blob([teksti],{type:'application/json;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='Zeiterfassung_'+dataISO()+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }catch(e){}
+}
+
 function vizato(){
   var el=document.getElementById('lista');
   if(!gHyrjet.length){
@@ -176,8 +277,15 @@ function vizato(){
   var html='', gjith=0;
   for(var i=0;i<gHyrjet.length;i++){
     var h=gHyrjet[i];
-    var m = h.bis ? h.minuta : minutaTe(h.von);
+    var m = h.abwesend ? 0 : (h.bis ? h.minuta : minutaTe(h.von));
     gjith+=m;
+    if(h.abwesend){
+      html+='<div class="obj" style="border-color:#E74C3C">'+
+        '<span class="obj-nr">🏠</span>'+
+        '<span class="obj-em">'+h.abgrund+' · '+h.bezeichnung+'</span>'+
+        '<span class="obj-or">'+h.ore+'h</span></div>';
+      continue;
+    }
     html+='<div class="obj'+(h.bis?'':' aktiv')+'">'+
       '<span class="obj-nr">'+h.nr+'</span>'+
       '<span class="obj-em">'+h.emri+(h.bis?'':' · në punë')+'</span>'+
