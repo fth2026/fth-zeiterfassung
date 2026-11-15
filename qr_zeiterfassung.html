@@ -134,6 +134,21 @@ function ruajHyrjet(){
   for(var i=0;i<gHyrjet.length;i++) te_gjitha.push(gHyrjet[i]);
   localStorage.setItem(KEY_H,JSON.stringify(te_gjitha));
 }
+function lexoLinkun(){
+  var m=window.location.search.match(/[?&]objekt=(\d+)/);
+  if(!m) m=window.location.hash.match(/objekt=(\d+)/);
+  if(!m) return false;
+  var nr=parseInt(m[1]);
+  var o=gjejObjektin(nr);
+  if(!o) return false;
+  // mos e nise dy here te njejtin
+  for(var i=0;i<gHyrjet.length;i++){
+    if(gHyrjet[i].nr===nr && !gHyrjet[i].bis) return true;
+  }
+  filloObjektin(nr);
+  document.getElementById('st-skan').textContent='✔ U hap nga QR: '+nr+' · '+o.name;
+  return true;
+}
 function mbushListen(){
   var sel=document.getElementById('zgjedh-obj');
   var html='<option value="">— Prek objektin —</option>';
@@ -272,6 +287,7 @@ ngarkoPunetoret();
 merrHyrjet();
 mbushListen();
 vizato();
+lexoLinkun();
 setInterval(tik,1000); tik();
 </script>
 </body>
