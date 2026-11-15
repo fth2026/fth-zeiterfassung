@@ -242,12 +242,13 @@ function filloMeNumer(){
 }
 function eksportoCSV(){
   if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
-  var r=['Datum\tObjekt_Nr\tEmri_Objektit\tKlienti\tVon\tBis\tStunden\tMinuten\tMitarbeiter'];
+  var r=['Datum;Objekt_Nr;Emri_Objektit;Klienti;Von;Bis;Stunden;Minuten;Mitarbeiter'];
   for(var i=0;i<gHyrjet.length;i++){
     var h=gHyrjet[i];
     var m=h.bis?h.minuta:minutaTe(h.von_iso);
+    var ka=h.klient.replace(/;/g,',');
     r.push([h.datum,h.nr,h.emri,h.klient,h.von,h.bis||'',
-      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join('\t'));
+      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join(';'));
   }
   var teksti=r.join('\r\n');
   var el=document.getElementById('eksport');
