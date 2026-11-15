@@ -1,1062 +1,294 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="sq">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>FTH · Zeiterfassung</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>FTH Hausmeister · QR</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-  :root {
-    --bg:       #0A0A16;
-    --panel:    #12122A;
-    --card:     #1A1A3A;
-    --gold:     #C8A84B;
-    --gold-lt:  #E8C96B;
-    --cyan:     #00BCD4;
-    --green:    #2ECC71;
-    --red:      #E74C3C;
-    --orange:   #E67E22;
-    --white:    #E8E8F8;
-    --gray:     #6868A8;
-    --border:   #2A2A5A;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--white);
-    min-height: 100vh;
-    padding-bottom: 40px;
-  }
-
-  /* ── Header ── */
-  header {
-    background: var(--panel);
-    border-bottom: 2px solid var(--gold);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    color: var(--gold);
-    letter-spacing: 2px;
-  }
-  header .sub {
-    font-size: 11px;
-    color: var(--gray);
-    margin-top: 2px;
-  }
-  .clock {
-    margin-left: auto;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    color: var(--cyan);
-    letter-spacing: 2px;
-  }
-
-  /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-  }
-  .tab {
-    flex: 1;
-    padding: 12px 8px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all .2s;
-  }
-  .tab.active {
-    color: var(--gold);
-    border-bottom-color: var(--gold);
-  }
-
-  /* ── Sections ── */
-  .section { display: none; padding: 16px; }
-  .section.active { display: block; }
-
-  /* ── Card ── */
-  .card {
-    background: var(--card);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    padding: 16px;
-    margin-bottom: 14px;
-  }
-  .card-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* ── Form fields ── */
-  .field { margin-bottom: 14px; }
-  .field label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gray);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-  .field input,
-  .field select {
-    width: 100%;
-    background: var(--panel);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color .2s;
-    -webkit-appearance: none;
-  }
-  .field input:focus,
-  .field select:focus {
-    border-color: var(--gold);
-  }
-  .field input.highlight {
-    border-color: var(--gold);
-    color: var(--gold);
-    font-weight: 600;
-    font-size: 18px;
-    text-align: center;
-  }
-
-  /* Zeit row */
-  .zeit-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-  }
-
-  /* ── Projekt info box ── */
-  .projekt-info {
-    background: var(--panel);
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--gray);
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all .2s;
-  }
-  .projekt-info.found {
-    border-color: var(--green);
-    color: var(--green);
-  }
-  .projekt-info.notfound {
-    border-color: var(--orange);
-    color: var(--orange);
-  }
-
-  /* ── Buttons ── */
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .btn:active { transform: scale(.97); }
-  .btn-gold   { background: var(--gold);   color: #0A0A16; }
-  .btn-green  { background: var(--green);  color: #0A0A16; }
-  .btn-cyan   { background: var(--cyan);   color: #0A0A16; }
-  .btn-red    { background: var(--red);    color: white; }
-  .btn-ghost  {
-    background: transparent;
-    border: 1.5px solid var(--border);
-    color: var(--gray);
-  }
-
-  /* ── Orë result ── */
-  .ore-result {
-    text-align: center;
-    padding: 14px;
-    border-radius: 10px;
-    margin: 12px 0;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 2px;
-    display: none;
-  }
-  .ore-result.normal { background: rgba(46,204,113,.15); color: var(--green); }
-  .ore-result.ueber  { background: rgba(231,76,60,.15);  color: var(--red); }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--green);
-    color: #0A0A16;
-    padding: 12px 28px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: transform .3s;
-    z-index: 999;
-    white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.error { background: var(--red); color: white; }
-
-  /* ── Liste hyrjet ── */
-  .entry-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    position: relative;
-  }
-  .entry-card .e-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-  .entry-card .e-date {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gold);
-  }
-  .entry-card .e-ore {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    color: var(--cyan);
-    letter-spacing: 1px;
-  }
-  .entry-card .e-ore.ueber { color: var(--red); }
-  .entry-card .e-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--white);
-  }
-  .entry-card .e-detail {
-    font-size: 12px;
-    color: var(--gray);
-    margin-top: 4px;
-  }
-  .entry-card .e-projekt {
-    font-size: 12px;
-    color: var(--cyan);
-    margin-top: 3px;
-  }
-  .entry-card .e-del {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--gray);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .entry-card .e-del:active { background: var(--red); color: white; border-color: var(--red); }
-
-  /* ── Totali bar ── */
-  .total-bar {
-    background: var(--card);
-    border: 1px solid var(--gold);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-  }
-  .total-bar .t-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    color: var(--gold);
-  }
-  .total-bar .t-lbl {
-    font-size: 10px;
-    color: var(--gray);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* ── Filter ── */
-  .filter-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .range-hint {
-    font-size: 11px;
-    color: var(--gray);
-    margin-top: 5px;
-    padding: 6px 10px;
-    background: rgba(200,168,75,.08);
-    border-radius: 6px;
-    border-left: 2px solid var(--gold);
-  }
-
-  /* ── Export instruction ── */
-  /* ── Mode selector ── */
-  .mode-row { display:flex; gap:10px; margin-bottom:16px; }
-  .mode-btn {
-    flex:1; padding:12px; border:2px solid var(--border);
-    border-radius:10px; background:transparent;
-    color:var(--gray); font-family:'DM Sans',sans-serif;
-    font-size:14px; font-weight:600; cursor:pointer;
-    transition:all .2s;
-  }
-  .mode-btn.active-arb { background:rgba(41,128,185,.2); border-color:var(--cyan); color:var(--cyan); }
-  .mode-btn.active-abw { background:rgba(231,76,60,.15); border-color:var(--red);  color:var(--red); }
-  .abwes-note {
-    background:rgba(231,76,60,.1); border:1px solid rgba(231,76,60,.3);
-    border-radius:8px; padding:10px 14px; font-size:13px;
-    color:var(--red); margin-bottom:12px; display:none;
-  }
-
-  .info-box {
-    background: rgba(0,188,212,.08);
-    border: 1px solid rgba(0,188,212,.3);
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 13px;
-    color: var(--cyan);
-    line-height: 1.6;
-    margin-bottom: 14px;
-  }
-  .info-box strong { color: var(--white); }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d0d1a;--card:#16213e;--panel:#1a1a2e;--gold:#C8A84B;--cyan:#00BCD4;
+--green:#27AE60;--red:#E74C3C;--gray:#8888AA;--white:#e8e8f0;--orange:#E67E22}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+background:var(--bg);color:var(--white);min-height:100vh;padding:14px;overflow-x:hidden}
+.karta{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;
+border:1px solid #2a2a50}
+.tit{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:10px}
+label{display:block;font-size:.78rem;color:var(--gray);margin:10px 0 5px;font-weight:600}
+select,input{width:100%;padding:13px;border-radius:10px;border:1px solid #2a2a50;
+background:#0d0d1a;color:var(--white);font-size:1rem}
+button{border:none;border-radius:12px;padding:16px;font-size:1rem;font-weight:700;
+width:100%;margin-top:10px;cursor:pointer}
+.b-green{background:var(--green);color:#fff}
+.b-red{background:var(--red);color:#fff}
+.b-cyan{background:var(--cyan);color:#081018}
+.b-gold{background:var(--gold);color:#1a1a2e}
+.b-gray{background:#2a2a50;color:var(--white)}
+.rresht{display:flex;gap:10px}
+.rresht button{margin-top:0}
+.obj{background:#0d0d1a;border-radius:10px;padding:11px 13px;margin-top:8px;
+display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a50}
+.obj.aktiv{border-color:var(--green);background:#0d2a1a}
+.obj-nr{font-weight:700;color:var(--gold);font-size:1rem;margin-right:8px}
+.obj-em{font-size:.8rem;flex:1}
+.obj-or{font-size:.85rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums}
+.ora-madhe{font-size:2.6rem;font-weight:700;color:var(--cyan);text-align:center;
+font-variant-numeric:tabular-nums;letter-spacing:2px;margin:6px 0}
+.qrbox{width:100%;max-width:320px;margin:8px auto;border-radius:12px;overflow:hidden}
+video{width:100%;display:block;background:#000}
+.hide{display:none!important}
+.st{font-size:.82rem;margin-top:8px;min-height:18px;text-align:center}
+.help{font-size:.72rem;color:var(--gray);margin-top:6px;text-align:center}
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="logo">⏱ FTH · Zeiterfassung</div>
-    <div class="sub">Punëtorët — Regjistro orët</div>
-  </div>
-  <div class="clock" id="clock">--:--</div>
-</header>
-
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('form')">✏️ Shëno</div>
-  <div class="tab" onclick="switchTab('liste')">📋 Lista</div>
-  <div class="tab" onclick="switchTab('info')">ℹ️ Info</div>
+<div class="karta">
+  <div class="tit">👷 FTH Hausmeister · QR</div>
+  <label>Punëtori</label>
+  <select id="punetori"></select>
+  <div class="ora-madhe" id="ora-now">--:--:--</div>
+  <div class="help" id="dita"></div>
 </div>
 
-<!-- ═══ TAB 1: FORMA ═══ -->
-<div class="section active" id="tab-form">
-
-  <div class="mode-row">
-    <button class="mode-btn active-arb" id="btn-arb" onclick="setMode('arbeit')">
-      🔨 Arbeitszeit
-    </button>
-    <button class="mode-btn" id="btn-abw" onclick="setMode('abwes')">
-      🏠 Abwesenheit
-    </button>
+<div class="karta">
+  <div class="tit">📋 Zgjidh objektin</div>
+  <select id="zgjedh-obj" onchange="zgjidhObjektin(this.value)">
+    <option value="">— Prek objektin —</option>
+  </select>
+  <div class="st" id="st-skan"></div>
+  <label>Ose shkruaj numrin (p.sh. 1001)</label>
+  <div class="rresht">
+    <input type="number" id="nr-dore" placeholder="1001" style="flex:2">
+    <button class="b-gold" style="flex:1" onclick="filloMeNumer()">▶ Nis</button>
   </div>
-
-  <div class="abwes-note" id="abwes-note">
-    ⚠️ Regjistro mungesë — nuk llogariten orë pune
-  </div>
-
-  <div class="card">
-    <div class="card-title">👤 Punëtori & Data</div>
-    <div class="field">
-      <label>Mitarbeiter</label>
-      <select id="mitarbeiter"></select>
-    </div>
-    <div class="field">
-      <label>Datum</label>
-      <input type="date" id="datum">
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">⏰ Orari</div>
-    <div class="zeit-row">
-      <div class="field">
-        <label>Von</label>
-        <input type="time" id="von" value="07:00">
-      </div>
-      <div class="field">
-        <label>Bis</label>
-        <input type="time" id="bis" value="16:00">
-      </div>
-      <div class="field">
-        <label>Pause (min)</label>
-        <input type="number" id="pause" value="30" min="0" max="180">
-      </div>
-    </div>
-
-    <div id="ore-result" class="ore-result"></div>
-    <button class="btn btn-cyan" onclick="llogarit()">🔢 Llogarit Orët</button>
-  </div>
-
-  <!-- Abwesenheit fields — shfaqen vetëm kur mode=abwes -->
-  <div class="card" id="card-abwes" style="display:none;border-color:rgba(231,76,60,.4)">
-    <div class="card-title" style="color:var(--red)">🏠 Arsyeja e Mungesës</div>
-    <div class="field">
-      <label>Lloji</label>
-      <select id="abgrund">
-        <option value="🤒  Krank (Sëmurë)">🤒  Krank — Sëmurë</option>
-        <option value="🏖  Urlaub (Pushim)">🏖  Urlaub — Pushim vjetor</option>
-        <option value="🏠  Homeoffice">🏠  Homeoffice</option>
-        <option value="👶  Elternzeit">👶  Elternzeit</option>
-        <option value="🔧  Arzttermin">🔧  Arzttermin — Te mjeku</option>
-        <option value="⚰️  Todesfall Familie">⚰️  Todesfall — Zi familjare</option>
-        <option value="📋  Sonstiges">📋  Sonstiges — Tjetër</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Kohëzgjatja</label>
-      <select id="ab-dite">
-        <option value="1 ditë e plotë">1 ditë e plotë</option>
-        <option value="0.5 gjysmë dite">0.5 — Gjysmë dite</option>
-        <option value="2 ditë">2 ditë</option>
-        <option value="3 ditë">3 ditë</option>
-        <option value="1 javë">1 javë e plotë</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Shënim (opsional)</label>
-      <input type="text" id="ab-notiz" placeholder="p.sh. raport mjekësor...">
-    </div>
-  </div>
-
-  <div class="card" id="card-projekt">
-    <div class="card-title">🏗️ Projekti</div>
-    <div class="field">
-      <label>Projekt_Nr</label>
-      <input type="number" id="projekt-nr" class="highlight"
-             placeholder="p.sh. 3 ose 1002"
-             oninput="kerko_projekt(this.value)">
-      <div class="range-hint">
-        1–1000 = Renovim &nbsp;·&nbsp; 1001–2000 = Hausmeister &nbsp;·&nbsp; 2001–3000 = Elektro
-      </div>
-    </div>
-    <div id="projekt-info" class="projekt-info">← fut numrin e projektit</div>
-    <div class="field" style="margin-top:12px">
-      <label>Tätigkeit</label>
-      <select id="taetigkeit">
-        <option>Renovim</option>
-        <option>Hausmeister</option>
-        <option>Elektro</option>
-        <option>Büro</option>
-        <option>Sonstiges</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Projekt_Name</label>
-      <input type="text" id="projekt-name" placeholder="plotësohet automatikisht...">
-    </div>
-  </div>
-
-  </div><!-- /card-projekt -->
-
-  <div class="card" id="card-notiz">
-    <div class="card-title">📝 Notiz (opsional)</div>
-    <div class="field">
-      <input type="text" id="notiz" placeholder="shënim shtesë...">
-    </div>
-  </div>
-
-  <button class="btn btn-green" id="btn-ruaj" onclick="ruaj_hyrjen()">💾 Ruaj Hyrjen</button>
-
 </div>
 
-<!-- ═══ TAB 2: LISTA ═══ -->
-<div class="section" id="tab-liste">
-
-  <div class="filter-row">
-    <div class="field">
-      <label>Mitarbeiter</label>
-      <select id="filt-ma" onchange="shfaq_liste()">
-        <option value="">Të gjithë</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Muaji</label>
-      <input type="month" id="filt-muaj" onchange="shfaq_liste()">
-    </div>
+<div class="karta">
+  <div class="tit">⏱ Objektet e sotme</div>
+  <div id="lista"></div>
+  <div class="rresht" style="margin-top:12px">
+    <button class="b-red" onclick="mbylleDiten()">⏹ Mbyll ditën</button>
   </div>
-
-  <div class="total-bar" id="total-bar" style="display:none">
-    <div><div class="t-val" id="t-dite">0</div><div class="t-lbl">Ditë</div></div>
-    <div><div class="t-val" id="t-ore">0.00h</div><div class="t-lbl">Orë Totale</div></div>
-    <div><div class="t-val" id="t-mes">0.00h</div><div class="t-lbl">Mesatare/Ditë</div></div>
+  <div class="rresht" style="margin-top:8px">
+    <button class="b-green" onclick="eksportoCSV()">📤 Eksporto Excel</button>
+    <button class="b-gray" id="btn-fshi" onclick="fshiDiten()">🗑 Fshi</button>
   </div>
-
-  <div id="liste-container"></div>
-
+  <textarea id="eksport" class="hide" rows="7" readonly
+    style="width:100%;margin-top:10px;font-size:.7rem;font-family:monospace;background:#0d0d1a;color:#e8e8f0;border:1px solid #2a2a50;border-radius:8px;padding:8px"></textarea>
+  <div class="st" id="st-lista"></div>
 </div>
-
-<!-- ═══ TAB 3: INFO ═══ -->
-<div class="section" id="tab-info">
-
-  <div class="info-box">
-    <strong>📱 Si funksionon:</strong><br><br>
-    1. Shëno hyrjen nga telefoni<br>
-    2. Kliko <strong>💾 Ruaj Hyrjen</strong><br>
-    3. Të dhënat ruhen automatikisht<br>
-    4. Shefi i sheh në FTH PRO 2026 në laptop
-  </div>
-
-  <div class="card">
-    <div class="card-title">👷 Menaxho Punëtorët</div>
-    <div class="field">
-      <label>Shto Punëtor të Ri</label>
-      <input type="text" id="punëtor-i-ri" placeholder="Emri Mbiemri">
-    </div>
-    <button class="btn btn-green" onclick="shto_punetor()">➕ Shto</button>
-
-    <div style="margin-top:14px">
-      <label style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px">
-        Lista e Punëtorëve
-      </label>
-      <div id="punëtoret-list" style="margin-top:8px"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📊 Eksporto të Dhënat</div>
-    <p style="font-size:13px;color:var(--gray);margin-bottom:12px">
-      Shkarko skedarin JSON për ta importuar në FTH PRO 2026 në laptop.
-    </p>
-    <button class="btn btn-gold" onclick="eksporto_json()">
-      📥 Shkarko Zeiterfassung.json
-    </button>
-  </div>
-
-  <!-- ── Projektet Import ── -->
-  <div class="card" style="border-color:rgba(200,168,75,.4)">
-    <div class="card-title" style="color:var(--gold)">🏗️ Importo Projektet nga Laptop</div>
-
-    <div class="info-box" style="margin-bottom:12px">
-      <strong>Si bëhet:</strong><br>
-      1. Në laptop → Zeiterfassung → klikoni <strong>"📤 Eksporto Projektet"</strong><br>
-      2. Hapet skedari <code>Projektet_web.json</code><br>
-      3. Kopjoje përmbajtjen e tij<br>
-      4. Ngjiteni këtu dhe klikoni <strong>"Importo"</strong>
-    </div>
-
-    <!-- Trego projektet aktuale -->
-    <div id="proj-status" style="font-size:13px;color:var(--gray);margin-bottom:10px">
-      Duke ngarkuar...
-    </div>
-
-    <div class="field">
-      <label>Ngjit JSON nga Projektet_web.json</label>
-      <textarea id="proj-json-input"
-        style="width:100%;height:100px;background:var(--panel);
-               border:1.5px solid var(--border);border-radius:8px;
-               padding:10px;color:var(--white);font-size:12px;
-               font-family:monospace;resize:vertical;outline:none"
-        placeholder='[{"nr":1,"name":"Renovierung Mustermann","taetigkeit":"Renovim"}, ...]'></textarea>
-    </div>
-    <button class="btn btn-gold" onclick="importo_proj_from_input()">
-      📥 Importo Projektet
-    </button>
-    <button class="btn btn-ghost" onclick="fshi_proj_cache()" style="margin-top:6px">
-      🗑 Pastro listën lokale
-    </button>
-  </div>
-
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════
-//  STORAGE — localStorage si database
-// ═══════════════════════════════════════════
-const ZEIT_KEY  = 'fth_zeiterfassung';
-const PT_KEY    = 'fth_punetoret';
-const PROJ_KEY  = 'fth_projektet';
+var OBJEKTET = [{"nr": 1001, "name": "Reinigung wie nach Plan", "klient": "Kindertageseinrichtung Sonnenschein"}, {"nr": 1002, "name": "Röllfeld, Steigweg 1", "klient": "Gies Immobilien GmbH"}, {"nr": 1003, "name": "Wörth am Main, Galgenstr. 6", "klient": "Praxis Dr. Plattner Dr. Vogel Dr. Ide"}, {"nr": 1004, "name": "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a", "klient": "PETERS GmbH"}, {"nr": 1005, "name": "Laudenbach, Mühlweg 51", "klient": "Gies Immobilien GmbH"}, {"nr": 1006, "name": "Obernburg, Obere Wallstr. 17-19", "klient": "AB-Hausverwaltung Wolf"}, {"nr": 1007, "name": "Klingenberg, Wilhelmstr. 63", "klient": "Markus Krall"}, {"nr": 1008, "name": "Wörth am Main, Beethovenstr. 2b", "klient": "Vereinigte Schiffs-Versicherung V.A.G"}, {"nr": 1009, "name": "Wörth am Main, Frühlingsstr. 13a - 13b", "klient": "Eva Schroll"}, {"nr": 1010, "name": "Wörth am Main, Moosgraben 25", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1011, "name": "Wörth am Main, Odenwaldstr. 30", "klient": "Ulrich Möller"}, {"nr": 1012, "name": "Haibach, Ludwigstr. 11", "klient": "Dieter Zang"}, {"nr": 1013, "name": "Wörth am Main, Presentstr. 19", "klient": "algeb awell GmbH"}, {"nr": 1014, "name": "Kleinheubach, Kastellstr. 11a", "klient": "Main Immo Team GmbH"}, {"nr": 1015, "name": "Wörth am Main, Erlenstr. 9", "klient": "Ismail Sezer"}, {"nr": 1016, "name": "Kleinheubach, Jahnstr. 17", "klient": "WEG Jahnstr. 17 c/o Perfect Living"}, {"nr": 1017, "name": "Wörth am Main, Presentstr. 18", "klient": "Firma Klein Zügner Gbr c/o Eilbacher"}, {"nr": 1018, "name": "Großwallstadt, Quellenstr. 5", "klient": "Main Immo Team GmbH"}, {"nr": 1019, "name": "Wörth am Main, Landstr. 78", "klient": "Erbengemeinschaft Wolf"}, {"nr": 1020, "name": "Elsenfeld, Hoffeldstraße 39", "klient": "Main Immo Team GmbH"}, {"nr": 1021, "name": "Elsenfeld, Finkenweg 14", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1022, "name": "Elsendelf, Droselweg 17", "klient": "Immobilien Hausverwaltung Schultz GmbH"}];
+var KEY_H = 'fth_hm_hyrjet';
+var KEY_P = 'fth_hm_punetori';
+var gHyrjet = [];
 
-function ngarko_hyrjet()   { try { return JSON.parse(localStorage.getItem(ZEIT_KEY)  || '[]'); } catch { return []; } }
-function ruaj_hyrjet(d)    { localStorage.setItem(ZEIT_KEY,  JSON.stringify(d)); }
-function ngarko_punetoret(){ try { return JSON.parse(localStorage.getItem(PT_KEY)    || '["Fahrush Thaqi","Avdyl Thaqi"]'); } catch { return ["Fahrush Thaqi","Avdyl Thaqi"]; } }
-function ruaj_punetoret(d) { localStorage.setItem(PT_KEY,    JSON.stringify(d)); }
-function ngarko_projektet(){ try { return JSON.parse(localStorage.getItem(PROJ_KEY)  || '[]'); } catch { return []; } }
-function ruaj_projektet(d) { localStorage.setItem(PROJ_KEY,  JSON.stringify(d)); }
-
-// ═══════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  // Ora live
-  setInterval(() => {
-    const n = new Date();
-    document.getElementById('clock').textContent =
-      String(n.getHours()).padStart(2,'0') + ':' +
-      String(n.getMinutes()).padStart(2,'0');
-  }, 1000);
-
-  // Data sot
-  const sot = new Date();
-  document.getElementById('datum').value = sot.toISOString().split('T')[0];
-
-  // Muaji aktual për filtër
-  document.getElementById('filt-muaj').value =
-    sot.getFullYear() + '-' + String(sot.getMonth()+1).padStart(2,'0');
-
-  populo_punetoret();
-  shfaq_liste();
-  shfaq_proj_status();
-
-  // Importo nga JSON nëse është hapur me ?import=...
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('import') === '1') importo_nga_clipboard();
-});
-
-// ═══════════════════════════════════════════
-//  PUNËTORËT
-// ═══════════════════════════════════════════
-function populo_punetoret() {
-  const lista = ngarko_punetoret();
-  const sel   = document.getElementById('mitarbeiter');
-  const filt  = document.getElementById('filt-ma');
-  const saved = sel.value;
-
-  sel.innerHTML  = lista.map(p => `<option value="${p}">${p}</option>`).join('');
-  filt.innerHTML = '<option value="">Të gjithë</option>' +
-                   lista.map(p => `<option value="${p}">${p}</option>`).join('');
-  if (saved) sel.value = saved;
-
-  // Lista në info tab
-  const div = document.getElementById('punëtoret-list');
-  div.innerHTML = lista.map((p,i) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;
-                padding:8px 10px;background:var(--panel);border-radius:6px;
-                margin-bottom:6px;font-size:14px">
-      <span>👤 ${p}</span>
-      <button onclick="fshi_punetor(${i})"
-              style="background:transparent;border:1px solid var(--border);
-                     color:var(--gray);border-radius:5px;padding:3px 8px;
-                     font-size:11px;cursor:pointer">✕</button>
-    </div>`).join('');
+function dy(v){return (v<10?'0':'')+v;}
+function oraTani(){
+  var d=new Date();
+  return dy(d.getHours())+':'+dy(d.getMinutes())+':'+dy(d.getSeconds());
 }
-
-function shto_punetor() {
-  const emri = document.getElementById('punëtor-i-ri').value.trim();
-  if (!emri) return toast('Shkruaj emrin!', true);
-  const lista = ngarko_punetoret();
-  if (lista.includes(emri)) return toast('Ekziston tashmë!', true);
-  lista.push(emri);
-  ruaj_punetoret(lista);
-  document.getElementById('punëtor-i-ri').value = '';
-  populo_punetoret();
-  toast('✔ ' + emri + ' u shtua!');
+function dataSot(){
+  var d=new Date();
+  return dy(d.getDate())+'.'+dy(d.getMonth()+1)+'.'+d.getFullYear();
 }
-
-function fshi_punetor(i) {
-  const lista = ngarko_punetoret();
-  const emri = lista[i];
-  if (!confirm('Fshi ' + emri + '?')) return;
-  lista.splice(i, 1);
-  ruaj_punetoret(lista);
-  populo_punetoret();
-  toast('U fshi!');
+function dataISO(){
+  var d=new Date();
+  return d.getFullYear()+'-'+dy(d.getMonth()+1)+'-'+dy(d.getDate());
 }
-
-// ═══════════════════════════════════════════
-//  PROJEKTET — kërko nga localStorage
-// ═══════════════════════════════════════════
-function kerko_projekt(nr_raw) {
-  const nr  = parseInt(nr_raw);
-  const info = document.getElementById('projekt-info');
-  const inp_name = document.getElementById('projekt-name');
-  const sel_taet = document.getElementById('taetigkeit');
-
-  if (!nr_raw || isNaN(nr)) {
-    info.className = 'projekt-info';
-    info.textContent = '← fut numrin e projektit';
+function minutaTe(iso){
+  var d=new Date(iso);
+  return Math.floor((Date.now()-d.getTime())/60000);
+}
+function oreDheMin(iso){
+  var m=minutaTe(iso);
+  return Math.floor(m/60)+'h '+dy(m%60)+'m';
+}
+function gjejObjektin(nr){
+  nr=parseInt(nr);
+  for(var i=0;i<OBJEKTET.length;i++) if(OBJEKTET[i].nr===nr) return OBJEKTET[i];
+  return null;
+}
+function ngarkoPunetoret(){
+  var sel=document.getElementById('punetori');
+  var p=['Fahrush Thaqi','Avdyl Thaqi','Arber Selmani'];
+  var ruajtur=localStorage.getItem(KEY_P);
+  var html='';
+  for(var i=0;i<p.length;i++){
+    html+='<option'+(ruajtur===p[i]?' selected':'')+'>'+p[i]+'</option>';
+  }
+  sel.innerHTML=html;
+}
+function merrHyrjet(){
+  try{ gHyrjet=JSON.parse(localStorage.getItem(KEY_H)||'[]'); }catch(e){ gHyrjet=[]; }
+  var sot=dataISO();
+  gHyrjet=gHyrjet.filter(function(h){return h.data===sot;});
+}
+function ruajHyrjet(){
+  var te_gjitha=[];
+  try{ te_gjitha=JSON.parse(localStorage.getItem(KEY_H)||'[]'); }catch(e){}
+  var sot=dataISO();
+  te_gjitha=te_gjitha.filter(function(h){return h.data!==sot;});
+  for(var i=0;i<gHyrjet.length;i++) te_gjitha.push(gHyrjet[i]);
+  localStorage.setItem(KEY_H,JSON.stringify(te_gjitha));
+}
+function lexoLinkun(){
+  var m=window.location.search.match(/[?&]objekt=(\d+)/);
+  if(!m) m=window.location.hash.match(/objekt=(\d+)/);
+  if(!m) return false;
+  var nr=parseInt(m[1]);
+  var o=gjejObjektin(nr);
+  if(!o) return false;
+  // mos e nise dy here te njejtin
+  for(var i=0;i<gHyrjet.length;i++){
+    if(gHyrjet[i].nr===nr && !gHyrjet[i].bis) return true;
+  }
+  filloObjektin(nr);
+  document.getElementById('st-skan').textContent='✔ U hap nga QR: '+nr+' · '+o.name;
+  return true;
+}
+function mbushListen(){
+  var sel=document.getElementById('zgjedh-obj');
+  var html='<option value="">— Prek objektin —</option>';
+  var sot=dataISO(), perdorur={};
+  for(var i=0;i<gHyrjet.length;i++){ if(gHyrjet[i].data===sot) perdorur[gHyrjet[i].nr]=true; }
+  for(var j=0;j<OBJEKTET.length;j++){
+    var o=OBJEKTET[j];
+    var shenja = perdorur[o.nr] ? '  ✔' : '';
+    html+='<option value="'+o.nr+'">'+o.nr+' · '+o.name+shenja+'</option>';
+  }
+  sel.innerHTML=html;
+}
+function zgjidhObjektin(v){
+  if(!v) return;
+  filloObjektin(v);
+  document.getElementById('zgjedh-obj').value='';
+}
+function vizato(){
+  var el=document.getElementById('lista');
+  if(!gHyrjet.length){
+    el.innerHTML='<div class="help">Ende pa objekte sot</div>';
+    document.getElementById('st-lista').textContent='';
     return;
   }
-
-  // Auto-tätigkeit nga range
-  let taet_auto = '';
-  if (nr >= 1    && nr <= 1000) taet_auto = 'Renovim';
-  else if (nr >= 1001 && nr <= 2000) taet_auto = 'Hausmeister';
-  else if (nr >= 2001 && nr <= 3000) taet_auto = 'Elektro';
-
-  // Kërko në listën lokale të projekteve
-  const projektet = ngarko_projektet();
-  const found = projektet.find(p => String(p.nr) === String(nr));
-
-  if (found) {
-    inp_name.value = found.name;
-    sel_taet.value = found.taetigkeit || taet_auto;
-    info.className = 'projekt-info found';
-    info.textContent = '✔  [' + sel_taet.value + ']  ' + found.name;
-  } else if (taet_auto) {
-    inp_name.value = '';
-    sel_taet.value = taet_auto;
-    info.className = 'projekt-info notfound';
-    info.textContent = '⚠  Tätigkeit: ' + taet_auto + ' · projekti nuk ekziston (shto në laptop)';
-  } else {
-    inp_name.value = '';
-    info.className = 'projekt-info notfound';
-    info.textContent = '⚠  Nr. ' + nr + ' jashtë rangut (1–3000)';
+  var html='', gjith=0;
+  for(var i=0;i<gHyrjet.length;i++){
+    var h=gHyrjet[i];
+    var m = h.bis ? h.minuta : minutaTe(h.von);
+    gjith+=m;
+    html+='<div class="obj'+(h.bis?'':' aktiv')+'">'+
+      '<span class="obj-nr">'+h.nr+'</span>'+
+      '<span class="obj-em">'+h.emri+(h.bis?'':' · në punë')+'</span>'+
+      '<span class="obj-or">'+h.von+(h.bis?' - '+h.bis:' ...')+'</span></div>';
   }
+  el.innerHTML=html;
+  document.getElementById('st-lista').textContent=
+    'Gjithsej: '+Math.floor(gjith/60)+'h '+dy(gjith%60)+'m ('+gHyrjet.length+' objekte)';
 }
-
-// ═══════════════════════════════════════════
-//  LLOGARIT ORË
-// ═══════════════════════════════════════════
-function llogarit() {
-  const von   = document.getElementById('von').value;
-  const bis   = document.getElementById('bis').value;
-  const pause = parseInt(document.getElementById('pause').value) || 0;
-  const div   = document.getElementById('ore-result');
-
-  if (!von || !bis) { toast('Fut Von dhe Bis!', true); return null; }
-
-  const [vh, vm] = von.split(':').map(Number);
-  const [bh, bm] = bis.split(':').map(Number);
-  let delta = (bh*60 + bm) - (vh*60 + vm) - pause;
-  if (delta < 0) delta += 24*60; // punë natën
-  const ore = delta / 60;
-
-  div.style.display = 'block';
-  if (ore > 8) {
-    div.className = 'ore-result ueber';
-    div.textContent = `⏱ ${ore.toFixed(2)}h  ⚠ Überstunden +${(ore-8).toFixed(2)}h`;
-  } else {
-    div.className = 'ore-result normal';
-    div.textContent = `⏱ Orë Neto: ${ore.toFixed(2)}h`;
-  }
-  return ore;
-}
-
-// ═══════════════════════════════════════════
-//  RUAJ HYRJEN
-// ═══════════════════════════════════════════
-function ruaj_hyrjen() {
-  const datum_raw = document.getElementById('datum').value;
-  if (!datum_raw) { toast('Zgjidhni datën!', true); return; }
-  const [y, m, d] = datum_raw.split('-');
-  const datum = `${d}.${m}.${y}`;
-  const ma    = document.getElementById('mitarbeiter').value;
-
-  if (currentMode === 'abwes') {
-    // ── Ruaj Abwesenheit ──
-    const grund = document.getElementById('abgrund').value;
-    const dite  = document.getElementById('ab-dite').value;
-    const abnotiz = document.getElementById('ab-notiz').value;
-
-    const hyrja = {
-      id:          Date.now().toString(),
-      datum:       datum,
-      mitarbeiter: ma,
-      von:         '—', bis: '—', pause: '0',
-      ore:         0.0,
-      lnr:         '',
-      bezeichnung: dite,
-      taetigkeit:  'ABWESENHEIT',
-      notiz:       abnotiz,
-      abwesend:    true,
-      abgrund:     grund,
-    };
-    const data = ngarko_hyrjet();
-    data.push(hyrja);
-    ruaj_hyrjet(data);
-    document.getElementById('ab-notiz').value = '';
-    toast('🏠  ' + grund + ' u regjistrua!');
-    shfaq_liste();
-    return;
-  }
-
-  // ── Ruaj Arbeitszeit ──
-  const ore = llogarit();
-  if (ore === null) return;
-
-  const hyrja = {
-    id:          Date.now().toString(),
-    datum:       datum,
-    mitarbeiter: ma,
-    von:         document.getElementById('von').value,
-    bis:         document.getElementById('bis').value,
-    pause:       document.getElementById('pause').value,
-    ore:         Math.round(ore * 100) / 100,
-    lnr:         document.getElementById('projekt-nr').value,
-    bezeichnung: document.getElementById('projekt-name').value,
-    taetigkeit:  document.getElementById('taetigkeit').value,
-    notiz:       document.getElementById('notiz').value,
-    abwesend:    false,
-  };
-
-  const data = ngarko_hyrjet();
-  data.push(hyrja);
-  ruaj_hyrjet(data);
-
-  document.getElementById('projekt-nr').value   = '';
-  document.getElementById('projekt-name').value  = '';
-  document.getElementById('notiz').value         = '';
-  document.getElementById('ore-result').style.display = 'none';
-  document.getElementById('projekt-info').className   = 'projekt-info';
-  document.getElementById('projekt-info').textContent = '← fut numrin e projektit';
-
-  toast('✔  Hyrja u ruajt!');
-  shfaq_liste();
-}
-
-// ═══════════════════════════════════════════
-//  LISTA
-// ═══════════════════════════════════════════
-function shfaq_liste() {
-  let data = ngarko_hyrjet();
-
-  const ma_flt  = document.getElementById('filt-ma').value;
-  const mj_raw  = document.getElementById('filt-muaj').value; // YYYY-MM
-  let   mj_flt  = '';
-  if (mj_raw) {
-    const [fy, fm] = mj_raw.split('-');
-    mj_flt = fm + '.' + fy; // MM.YYYY
-  }
-
-  if (ma_flt) data = data.filter(h => h.mitarbeiter === ma_flt);
-  if (mj_flt) data = data.filter(h => h.datum && h.datum.length >= 10 &&
-                                       h.datum.substring(3,10) === mj_flt);
-
-  // Rendit nga data — të rejat sipër
-  data.sort((a,b) => {
-    const da = a.datum.split('.').reverse().join('');
-    const db = b.datum.split('.').reverse().join('');
-    return db.localeCompare(da);
-  });
-
-  const container = document.getElementById('liste-container');
-  const totalBar  = document.getElementById('total-bar');
-
-  if (data.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--gray);font-size:14px">
-      Nuk ka hyrje për periudhën e zgjedhur</div>`;
-    totalBar.style.display = 'none';
-    return;
-  }
-
-  // Totali
-  const total_ore = data.reduce((s,h) => s + parseFloat(h.ore||0), 0);
-  const dite      = data.length;
-  totalBar.style.display = 'flex';
-  document.getElementById('t-dite').textContent = dite;
-  document.getElementById('t-ore').textContent  = total_ore.toFixed(2) + 'h';
-  document.getElementById('t-mes').textContent  = (total_ore/dite).toFixed(2) + 'h';
-
-  // Rreshtat
-  container.innerHTML = data.map(h => {
-    const ore   = parseFloat(h.ore||0);
-    const ueber = ore > 8 ? 'ueber' : '';
-    const lnr   = h.lnr ? `[${h.lnr}] ` : '';
-    const bez   = h.bezeichnung || '';
-    // Abwesenheit rresht i veçantë
-    if (h.abwesend || h.taetigkeit === 'ABWESENHEIT') {
-      const grund = h.abgrund || h.notiz || 'Abwesenheit';
-      const dite  = h.bezeichnung || '';
-      return `
-      <div class="entry-card" style="border-color:rgba(231,76,60,.4);background:rgba(231,76,60,.06)">
-        <button class="e-del" onclick="fshi_hyrjen('${h.id}')">✕</button>
-        <div class="e-header">
-          <span class="e-date">📅 ${h.datum}</span>
-          <span class="e-ore ueber">🏠 Abwesend</span>
-        </div>
-        <div class="e-name">👤 ${h.mitarbeiter}</div>
-        <div class="e-detail" style="color:#E74C3C;font-weight:600">${grund}</div>
-        ${dite ? `<div class="e-detail">📆 ${dite}</div>` : ''}
-        ${h.notiz && h.notiz !== grund ? `<div class="e-detail" style="color:var(--gray)">📝 ${h.notiz}</div>` : ''}
-      </div>`;
+function filloObjektin(teksti){
+  var nr=null;
+  var m=String(teksti).match(/(\d{3,5})/);
+  if(m) nr=parseInt(m[1]);
+  if(!nr){ document.getElementById('st-skan').textContent='⚠ Kodi nuk u lexua'; return; }
+  var o=gjejObjektin(nr);
+  if(!o){ document.getElementById('st-skan').textContent='⚠ Objekti '+nr+' nuk ekziston'; return; }
+  // a eshte hapur me pare?
+  for(var i=0;i<gHyrjet.length;i++){
+    if(gHyrjet[i].nr===nr && gHyrjet[i].bis){
+      document.getElementById('st-skan').textContent='⚠ Objekti '+nr+' u mbyll me pare';
+      return;
     }
-
-    return `
-    <div class="entry-card">
-      <button class="e-del" onclick="fshi_hyrjen('${h.id}')">✕</button>
-      <div class="e-header">
-        <span class="e-date">📅 ${h.datum}</span>
-        <span class="e-ore ${ueber}">${ore.toFixed(2)}h</span>
-      </div>
-      <div class="e-name">👤 ${h.mitarbeiter}</div>
-      <div class="e-detail">⏰ ${h.von} → ${h.bis}  ·  ☕ ${h.pause} min  ·  ${h.taetigkeit}</div>
-      ${bez ? `<div class="e-projekt">🏗 ${lnr}${bez}</div>` : ''}
-      ${h.notiz ? `<div class="e-detail" style="color:var(--gold);margin-top:3px">📝 ${h.notiz}</div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function fshi_hyrjen(id) {
-  if (!confirm('Fshi këtë hyrje?')) return;
-  const data = ngarko_hyrjet().filter(h => h.id !== id);
-  ruaj_hyrjet(data);
-  shfaq_liste();
-  toast('U fshi!');
-}
-
-// ═══════════════════════════════════════════
-//  EKSPORT → JSON (për laptop)
-// ═══════════════════════════════════════════
-function eksporto_json() {
-  const data = ngarko_hyrjet();
-  if (data.length === 0) { toast('Nuk ka të dhëna!', true); return; }
-
-  const blob = new Blob([JSON.stringify(data, null, 2)],
-                        { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'Zeiterfassung.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('✔  Zeiterfassung.json u shkarkua!');
-}
-
-// ═══════════════════════════════════════════
-//  IMPORTO projektet nga laptop (JSON paste)
-// ═══════════════════════════════════════════
-function importo_projektet(jsonText) {
-  try {
-    const data = JSON.parse(jsonText);
-    ruaj_projektet(data);
-    toast('✔  ' + data.length + ' projekte u importuan!');
-  } catch { toast('Format gabim!', true); }
-}
-
-// ═══════════════════════════════════════════
-//  MODE: Arbeitszeit / Abwesenheit
-// ═══════════════════════════════════════════
-let currentMode = 'arbeit';
-
-function setMode(mode) {
-  currentMode = mode;
-  const isAbw = mode === 'abwes';
-
-  document.getElementById('btn-arb').className =
-    'mode-btn' + (isAbw ? '' : ' active-arb');
-  document.getElementById('btn-abw').className =
-    'mode-btn' + (isAbw ? ' active-abw' : '');
-
-  document.getElementById('abwes-note').style.display   = isAbw ? 'block' : 'none';
-  document.getElementById('card-abwes').style.display   = isAbw ? 'block' : 'none';
-  document.getElementById('card-projekt').style.display = isAbw ? 'none'  : 'block';
-  document.getElementById('card-notiz').style.display   = isAbw ? 'none'  : 'block';
-
-  // Ndryshimi i butonit
-  const btn = document.getElementById('btn-ruaj');
-  btn.textContent = isAbw ? '🏠 Regjistro Mungesën' : '💾 Ruaj Hyrjen';
-  btn.className   = isAbw ? 'btn btn-red' : 'btn btn-green';
-
-  // Fshih ore result
-  document.getElementById('ore-result').style.display = 'none';
-}
-
-// ═══════════════════════════════════════════
-//  PROJEKTET — Import & Status
-// ═══════════════════════════════════════════
-function shfaq_proj_status() {
-  const lista = ngarko_projektet();
-  const el = document.getElementById('proj-status');
-  if (!el) return;
-  if (lista.length === 0) {
-    el.innerHTML = '<span style="color:var(--orange)">⚠ Nuk ka projekte — fut JSON nga laptop</span>';
-  } else {
-    const renovim  = lista.filter(p => p.taetigkeit === 'Renovim').length;
-    const haus     = lista.filter(p => p.taetigkeit === 'Hausmeister').length;
-    const elektro  = lista.filter(p => p.taetigkeit === 'Elektro').length;
-    el.innerHTML =
-      `<span style="color:var(--green)">✔ ${lista.length} projekte të ngarkuara</span><br>` +
-      `<span style="font-size:11px">🔨 Renovim: ${renovim} &nbsp; 🏢 Hausmeister: ${haus} &nbsp; ⚡ Elektro: ${elektro}</span>`;
+    if(gHyrjet[i].nr===nr && !gHyrjet[i].bis){
+      document.getElementById('st-skan').textContent='ℹ Objekti '+nr+' eshte duke u numeruar';
+      return;
+    }
   }
-}
-
-function importo_proj_from_input() {
-  const txt = document.getElementById('proj-json-input').value.trim();
-  if (!txt) { toast('Ngjit JSON-in fillimisht!', true); return; }
-  try {
-    const data = JSON.parse(txt);
-    if (!Array.isArray(data)) throw new Error('Duhet të jetë array []');
-    // Normalizo — prano si {nr, name, taetigkeit} ose {Projekt_Nr, Projekt_Name, Tätigkeit}
-    const normalized = data.map(p => ({
-      nr:         p.nr         ?? p.Projekt_Nr  ?? p.projekt_nr,
-      name:       p.name       ?? p.Projekt_Name?? p.projekt_name ?? '',
-      taetigkeit: p.taetigkeit ?? p.Tätigkeit   ?? p.taetigkeit   ?? '',
-    })).filter(p => p.nr !== undefined && p.nr !== null);
-
-    ruaj_projektet(normalized);
-    document.getElementById('proj-json-input').value = '';
-    shfaq_proj_status();
-    toast('✔  ' + normalized.length + ' projekte u importuan!');
-  } catch(e) {
-    toast('Format gabim: ' + e.message, true);
+  // mbyll objektin e hapur
+  for(var j=0;j<gHyrjet.length;j++){
+    if(!gHyrjet[j].bis){
+      gHyrjet[j].bis=oraTani().slice(0,5);
+      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
+    }
   }
-}
-
-function fshi_proj_cache() {
-  if (!confirm('Fshi të gjitha projektet lokale?')) return;
-  localStorage.removeItem('fth_projektet');
-  shfaq_proj_status();
-  toast('Lista u pastrua!');
-}
-
-// ═══════════════════════════════════════════
-//  TABS
-// ═══════════════════════════════════════════
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', ['form','liste','info'][i] === name);
+  var tani=new Date();
+  gHyrjet.push({
+    data:dataISO(), datum:dataSot(), nr:o.nr, emri:o.name, klient:o.klient,
+    von:oraTani().slice(0,5), von_iso:tani.toISOString(), bis:null, minuta:0,
+    punetori:document.getElementById('punetori').value
   });
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'liste') shfaq_liste();
-  if (name === 'info')  { populo_punetoret(); shfaq_proj_status(); }
+  ruajHyrjet(); vizato(); mbushListen();
+  document.getElementById('st-skan').textContent='✔ '+o.nr+' · '+o.name;
 }
-
-// ═══════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════
-function toast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent  = msg;
-  t.className    = 'toast show' + (isErr ? ' error' : '');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+function mbyllAktivin(){
+  for(var j=0;j<gHyrjet.length;j++){
+    if(!gHyrjet[j].bis){
+      gHyrjet[j].bis=oraTani().slice(0,5);
+      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
+    }
+  }
+  ruajHyrjet(); vizato(); mbushListen();
 }
+function mbylleDiten(){
+  mbyllAktivin();
+  document.getElementById('st-lista').textContent='✔ Dita u mbyll - '+gHyrjet.length+' objekte';
+}
+function filloMeNumer(){
+  var v=document.getElementById('nr-dore').value;
+  if(!v) return;
+  filloObjektin(v);
+  document.getElementById('nr-dore').value='';
+}
+function eksportoCSV(){
+  if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
+  var r=['Datum\tObjekt_Nr\tEmri_Objektit\tKlienti\tVon\tBis\tStunden\tMinuten\tMitarbeiter'];
+  for(var i=0;i<gHyrjet.length;i++){
+    var h=gHyrjet[i];
+    var m=h.bis?h.minuta:minutaTe(h.von_iso);
+    r.push([h.datum,h.nr,h.emri,h.klient,h.von,h.bis||'',
+      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join('\t'));
+  }
+  var teksti=r.join('\r\n');
+  var el=document.getElementById('eksport');
+  el.value=teksti;
+  el.classList.remove('hide');
+  document.getElementById('st-lista').textContent='Kopjo tekstin dhe ngjite ne Excel';
+  try{ el.select(); document.execCommand('copy'); document.getElementById('st-lista').textContent='✔ U kopjua! Ngjite ne Excel'; }catch(e){}
+  // provo shkarkimin (funksionon vetem ne disa telefona)
+  try{
+    var blob=new Blob(['\ufeff'+teksti],{type:'text/csv;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='FTH_Hausmeister_'+dataISO()+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }catch(e){}
+}
+function fshiDiten(){
+  var b=document.getElementById('btn-fshi');
+  if(b.dataset.bere!=='1'){
+    b.dataset.bere='1';
+    b.textContent='⚠ Prek perseri per te fshire';
+    b.style.background='#8e2b20';
+    setTimeout(function(){ b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background=''; },4000);
+    return;
+  }
+  gHyrjet=[]; ruajHyrjet(); vizato(); mbushListen();
+  var el=document.getElementById('eksport'); el.value=''; el.classList.add('hide');
+  document.getElementById('st-lista').textContent='✔ U fshine te gjitha';
+  b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background='';
+}
+function tik(){
+  document.getElementById('ora-now').textContent=oraTani();
+  document.getElementById('dita').textContent='Dita: '+dataSot();
+  if(gHyrjet.length && !gHyrjet[gHyrjet.length-1].bis) vizato();
+}
+ngarkoPunetoret();
+merrHyrjet();
+mbushListen();
+vizato();
+lexoLinkun();
+setInterval(tik,1000); tik();
 </script>
 </body>
 </html>
