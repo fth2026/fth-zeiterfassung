@@ -43,12 +43,29 @@ video{width:100%;display:block;background:#000}
 </head>
 <body>
 
+
+<div class="karta" id="ekrani-hyrje">
+  <div class="tit">🔐 Hyrja e punëtorit</div>
+  <label>Zgjidh emrin tënd</label>
+  <select id="login-punetori">
+    <option value="">— Zgjidh punëtorin —</option>
+  </select>
+  <label>Fut PIN-in (4 shifra)</label>
+  <input type="password" id="login-pin" maxlength="4" inputmode="numeric"
+         placeholder="••••" style="text-align:center;font-size:1.6rem;letter-spacing:10px">
+  <button class="b-cyan" onclick="hyj()">🔓 Hyr</button>
+  <div class="st" id="st-login"></div>
+  <div class="help">PIN-i fillestar: 1234 · ndryshoje te Cilësimet</div>
+</div>
+
+<div id="faqja-kryesore" class="hide">
 <div class="karta">
   <div class="tit">👷 FTH Hausmeister · QR</div>
   <label>Punëtori</label>
   <select id="punetori"></select>
   <div class="ora-madhe" id="ora-now">--:--:--</div>
   <div class="help" id="dita"></div>
+  <button class="b-gray" onclick="dale()" style="margin-top:8px">🚪 Dil</button>
 </div>
 
 <div class="karta">
@@ -62,6 +79,16 @@ video{width:100%;display:block;background:#000}
     <input type="number" id="nr-dore" placeholder="1001" style="flex:2">
     <button class="b-gold" style="flex:1" onclick="filloMeNumer()">▶ Nis</button>
   </div>
+</div>
+
+<div class="karta">
+  <div class="tit">⚙ Cilësimet</div>
+  <label>PIN-i aktual</label>
+  <input type="password" id="pin-old" maxlength="4" inputmode="numeric" placeholder="••••">
+  <label>PIN-i i ri (4 shifra)</label>
+  <input type="password" id="pin-new" maxlength="4" inputmode="numeric" placeholder="••••">
+  <button class="b-cyan" onclick="ndryshoPin()">🔐 Ndrysho PIN-in</button>
+  <div class="st" id="st-pin"></div>
 </div>
 
 <div class="karta">
@@ -96,12 +123,17 @@ video{width:100%;display:block;background:#000}
     <button class="b-red" onclick="mbylleDiten()">⏹ Mbyll ditën</button>
   </div>
   <div class="rresht" style="margin-top:8px">
+    <button class="b-gray" onclick="shfaqTeGjithe()">👥 Të gjithë punëtorët</button>
+    <button class="b-gray" onclick="shfaqVetemMua()">👤 Vetëm unë</button>
+  </div>
+  <div class="rresht" style="margin-top:8px">
     <button class="b-green" onclick="eksportoCSV()">📤 Eksporto Excel</button>
     <button class="b-gold" onclick="eksportoJSONlaptop()">💾 Ruaj JSON (OneDrive)</button>
     <button class="b-gray" id="btn-fshi" onclick="fshiDiten()">🗑 Fshi</button>
   </div>
   <textarea id="eksport" class="hide" rows="7" readonly
     style="width:100%;margin-top:10px;font-size:.7rem;font-family:monospace;background:#0d0d1a;color:#e8e8f0;border:1px solid #2a2a50;border-radius:8px;padding:8px"></textarea>
+  <div class="st" id="st-auto"></div>
   <div class="st" id="st-lista"></div>
 </div>
 
@@ -110,6 +142,7 @@ var OBJEKTET = [{"nr": 1001, "name": "Reinigung wie nach Plan", "klient": "Kinde
 var KEY_H = 'fth_hm_hyrjet';
 var KEY_P = 'fth_hm_punetori';
 var gHyrjet = [];
+var gTeGjithe = false;
 
 function dy(v){return (v<10?'0':'')+v;}
 function oraTani(){
@@ -139,11 +172,9 @@ function gjejObjektin(nr){
 }
 function ngarkoPunetoret(){
   var sel=document.getElementById('punetori');
-  var p=['Fahrush Thaqi','Avdyl Thaqi','Arber Selmani'];
-  var ruajtur=localStorage.getItem(KEY_P);
   var html='';
-  for(var i=0;i<p.length;i++){
-    html+='<option'+(ruajtur===p[i]?' selected':'')+'>'+p[i]+'</option>';
+  for(var i=0;i<PUNETORET.length;i++){
+    html+='<option>' + PUNETORET[i] + '</option>';
   }
   sel.innerHTML=html;
 }
@@ -151,6 +182,7 @@ function merrHyrjet(){
   try{ gHyrjet=JSON.parse(localStorage.getItem(KEY_H)||'[]'); }catch(e){ gHyrjet=[]; }
   var sot=dataISO();
   gHyrjet=gHyrjet.filter(function(h){return h.data===sot;});
+  if(gPunetor && !gTeGjithe){ gHyrjet=gHyrjet.filter(function(h){return (h.punetori||h.mitarbeiter)===gPunetor;}); }
 }
 function ruajHyrjet(){
   var te_gjitha=[];
@@ -160,6 +192,92 @@ function ruajHyrjet(){
   for(var i=0;i<gHyrjet.length;i++) te_gjitha.push(gHyrjet[i]);
   localStorage.setItem(KEY_H,JSON.stringify(te_gjitha));
 }
+
+
+var gPunetor = null;
+var KEY_PIN = 'fth_pin';
+var PUNETORET = ['Fahrush Thaqi','Avdyl Thaqi','Arber Selmani'];
+
+function mbushLogin(){
+  var sel=document.getElementById('login-punetori');
+  var ruajtur=localStorage.getItem('fth_punetori');
+  var html='<option value="">— Zgjidh punëtorin —</option>';
+  for(var i=0;i<PUNETORET.length;i++){
+    html+='<option value="'+PUNETORET[i]+'"'+(ruajtur===PUNETORET[i]?' selected':'')+'>'+PUNETORET[i]+'</option>';
+  }
+  sel.innerHTML=html;
+}
+
+function merrPin(em){
+  try{
+    var p=JSON.parse(localStorage.getItem(KEY_PIN)||'{}');
+    return p[em]||'1234';
+  }catch(e){ return '1234'; }
+}
+
+function hyj(){
+  var em=document.getElementById('login-punetori').value;
+  var pin=document.getElementById('login-pin').value;
+  if(!em){ document.getElementById('st-login').textContent='⚠ Zgjidh emrin!'; return; }
+  if(pin.length!==4){ document.getElementById('st-login').textContent='⚠ PIN-i ka 4 shifra!'; return; }
+  if(pin!==merrPin(em)){ document.getElementById('st-login').textContent='⚠ PIN i gabuar!'; return; }
+  gPunetor=em;
+  localStorage.setItem('fth_punetori', em);
+  document.getElementById('ekrani-hyrje').classList.add('hide');
+  document.getElementById('faqja-kryesore').classList.remove('hide');
+  document.getElementById('punetori').value=em;
+  gHyrjet=[]; merrHyrjet(); mbushListen(); vizato();
+  document.getElementById('st-login').textContent='';
+  document.getElementById('login-pin').value='';
+}
+
+function ndryshoPin(){
+  var old=document.getElementById('pin-old').value;
+  var ri=document.getElementById('pin-new').value;
+  if(old!==merrPin(gPunetor)){ document.getElementById('st-pin').textContent='⚠ PIN-i aktual gabim!'; return; }
+  if(ri.length!==4){ document.getElementById('st-pin').textContent='⚠ PIN-i i ri ka 4 shifra!'; return; }
+  var p={};
+  try{ p=JSON.parse(localStorage.getItem(KEY_PIN)||'{}'); }catch(e){}
+  p[gPunetor]=ri;
+  localStorage.setItem(KEY_PIN, JSON.stringify(p));
+  document.getElementById('pin-old').value='';
+  document.getElementById('pin-new').value='';
+  document.getElementById('st-pin').textContent='✔ PIN-i u ndryshua!';
+}
+
+function dale(){
+  gPunetor=null;
+  gHyrjet=[];
+  document.getElementById('ekrani-hyrje').classList.remove('hide');
+  document.getElementById('faqja-kryesore').classList.add('hide');
+  document.getElementById('login-pin').value='';
+}
+
+function ruajAutomatik(){
+  if(!gHyrjet.length) return;
+  try{
+    var d=[];
+    for(var i=0;i<gHyrjet.length;i++){
+      var h=gHyrjet[i];
+      if(h.abwesend){
+        d.push({id:h.id,datum:h.datum,mitarbeiter:h.mitarbeiter,
+          abwesend:true,von:'\u2014',bis:'\u2014',pause:'0',
+          ore:h.ore,lnr:'',bezeichnung:h.bezeichnung,
+          taetigkeit:'ABWESENHEIT',notiz:h.notiz,abgrund:h.abgrund});
+      } else {
+        var m=h.bis?h.minuta:minutaTe(h.von_iso);
+        d.push({id:h.id,datum:h.datum,mitarbeiter:h.mitarbeiter,
+          abwesend:false,von:h.von,bis:h.bis||'',pause:'0',
+          ore:Math.round(m/60*100)/100,lnr:String(h.nr),
+          bezeichnung:h.emri,taetigkeit:'Hausmeister',notiz:'',abgrund:''});
+      }
+    }
+    localStorage.setItem('fth_auto_dump', JSON.stringify(d));
+    document.getElementById('st-auto').textContent=
+      '\u2714 T\u00eb dh\u00ebnat u ruajt\u00ebn automatikisht ('+d.length+' hyrje)';
+  }catch(e){}
+}
+
 function lexoLinkun(){
   var m=window.location.search.match(/[?&]objekt=(\d+)/);
   if(!m) m=window.location.hash.match(/objekt=(\d+)/);
@@ -267,6 +385,16 @@ function eksportoJSONlaptop(){
   }catch(e){}
 }
 
+function shfaqTeGjithe(){
+  gTeGjithe=true;
+  merrHyrjet(); vizato();
+}
+
+function shfaqVetemMua(){
+  gTeGjithe=false;
+  merrHyrjet(); vizato();
+}
+
 function vizato(){
   var el=document.getElementById('lista');
   if(!gHyrjet.length){
@@ -282,13 +410,13 @@ function vizato(){
     if(h.abwesend){
       html+='<div class="obj" style="border-color:#E74C3C">'+
         '<span class="obj-nr">🏠</span>'+
-        '<span class="obj-em">'+h.abgrund+' · '+h.bezeichnung+'</span>'+
+        '<span class="obj-em">'+h.abgrund+' · '+h.bezeichnung+' · '+(h.punetori||h.mitarbeiter||'').split(' ')[0]+'</span>'+
         '<span class="obj-or">'+h.ore+'h</span></div>';
       continue;
     }
     html+='<div class="obj'+(h.bis?'':' aktiv')+'">'+
       '<span class="obj-nr">'+h.nr+'</span>'+
-      '<span class="obj-em">'+h.emri+(h.bis?'':' · në punë')+'</span>'+
+      '<span class="obj-em">'+(h.punetori? h.punetori.split(' ')[0]+' · ':'')+h.emri+(h.bis?'':' · në punë')+'</span>'+
       '<span class="obj-or">'+h.von+(h.bis?' - '+h.bis:' ...')+'</span></div>';
   }
   el.innerHTML=html;
@@ -393,11 +521,15 @@ function tik(){
   if(gHyrjet.length && !gHyrjet[gHyrjet.length-1].bis) vizato();
 }
 ngarkoPunetoret();
-merrHyrjet();
+mbushLogin();
+
 mbushListen();
 vizato();
 lexoLinkun();
+ruajAutomatik();
+setInterval(ruajAutomatik, 60000);
 setInterval(tik,1000); tik();
+</div>
 </script>
 </body>
 </html>
