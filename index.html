@@ -196,6 +196,7 @@ textarea{width:100%;height:75px;background:#0d0d1a;color:var(--white);
 .bosh{text-align:center;padding:30px 16px;color:var(--gray)}
 .bosh-ico{font-size:2.2rem;margin-bottom:8px}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body ontouchstart="">
 
@@ -490,6 +491,7 @@ var gObjektet   = [];  // objekte të punuara gjatë ditës
 var gFiltro     = null;
 
 var KEY_H   = 'fth_hyrjet';
+var KEY_OD  = 'fth_objekte_dita';  // objektet e punuara sot
 var KEY_PR  = 'fth_projektet';
 var KEY_PT  = 'fth_punetoret';
 var KEY_PIN = 'fth_pinat';
@@ -614,28 +616,31 @@ function objektNgaLinku(){
   return m ? parseInt(m[1]) : null;
 }
 
-function nisObjektinNgaLinku(){
-  var nr=objektNgaLinku();
-  if(!nr) return;
-  var ni=parseInt(nr);
-  var o=null;
-  try{ var p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');
-       if(!p||!p.length) p=OBJEKTET_BRENDA;
-       o=p.find(function(x){return x.nr==ni;}); }catch(e){}
-  var lista=document.getElementById('objekte-lista');
-  var info=document.getElementById('obj-info');
-  gObjektet=[{nr:String(ni), bez:(o?o.name:''), taet:'Hausmeister', notiz:''}];
-  perditesoObjekteLista();
-  if(info) info.textContent = o ? '\u2714 Nga QR: ' + o.name : '\u26a0 Objekti ' + ni;
+function ruajObjektetEDites(){
+  try{
+    var sot=new Date();
+    var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+    localStorage.setItem(KEY_OD, JSON.stringify({datum:tag, objekte:gObjektet}));
+  }catch(e){}
 }
 
-function inicioApp(){
+function lexoObjektetEDites(){
+  try{
+    var d=JSON.parse(localStorage.getItem(KEY_OD)||'null');
+    if(!d || !d.objekte) return [];
+    var sot=new Date();
+    var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+    return (d.datum===tag) ? d.objekte : [];
+  }catch(e){ return []; }
+}
+
+function nisObjektinNgaLinku(){function inicioApp(){
   var sot=new Date();
   document.getElementById('inp-datum').value=
     sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
   document.getElementById('filt-muaj').value=
     sot.getFullYear()+'-'+pad(sot.getMonth()+1);
-  gObjektet=[];
+  gObjektet=lexoObjektetEDites();
   perditesoObjekteLista();
   shfaqTeGjitha();
   perditesoMuajTitull();
@@ -834,8 +839,8 @@ function hapQR(){
   .then(function(s){
     gQRStream=s; v.srcObject=s; v.play(); gQRDuke=true;
     wrap.classList.remove('hide');
-    st.textContent='Drejtoji kamerën kodit QR...';
-    skanoQR();
+    st.textContent='Drejtoji kamerën kodit QR dhe mbaje ~20 cm larg...';
+    setTimeout(skanoQR, 800);
   })
   .catch(function(e){
     var em=(e && e.name) || '';
@@ -859,22 +864,38 @@ function skanoQR(){
   if(!gQRDuke) return;
   var v=document.getElementById('qr-video');
   var st=document.getElementById('st-qr');
-  if(!('BarcodeDetector' in window)){
-    st.textContent='⚠ Ky telefon s\'e lexon QR vetë. Shkruaj numrin.'; return;
-  }
-  if(!gQRDetektor){ gQRDetektor=new BarcodeDetector({formats:['qr_code']}); }
-  gQRDetektor.detect(v).then(function(list){
-    if(list && list.length){
-      var teksti=list[0].rawValue;
-      var m=String(teksti).match(/(\d{3,5})/);
+  if(!v || v.readyState!==v.HAVE_ENOUGH_DATA){ setTimeout(skanoQR,300); return; }
+
+  try{
+    // Vizato kornizen e videos ne canvas dhe lexoje me jsQR
+    var cv=document.createElement('canvas');
+    cv.width=v.videoWidth; cv.height=v.videoHeight;
+    var cx=cv.getContext('2d');
+    cx.drawImage(v,0,0,cv.width,cv.height);
+    var im=cx.getImageData(0,0,cv.width,cv.height);
+
+    var kodi=null;
+    if(typeof jsQR==='function'){
+      kodi=jsQR(im.data, im.width, im.height, {inversionAttempts:'dontInvert'});
+    }
+
+    if(kodi && kodi.data){
+      var m=String(kodi.data).match(/(\d{3,5})/);
       ndalQR();
-      if(m){ document.getElementById('obj-nr').value=m[1]; kerkoObj(m[1]);
-             st.textContent='✔ U lexua: '+m[1]; }
-      else { st.textContent='⚠ Kodi nuk u lexua'; }
+      if(m){
+        document.getElementById('obj-nr').value=m[1];
+        kerkoObj(m[1]);
+        st.textContent='\u2714 U lexua: '+m[1];
+      } else {
+        st.textContent='\u26a0 Kodi nuk u lexua';
+      }
       return;
     }
-    setTimeout(skanoQR,400);
-  }).catch(function(){ setTimeout(skanoQR,600); });
+    // Nese nuk u lexua, provo serish
+    setTimeout(skanoQR,350);
+  }catch(e){
+    setTimeout(skanoQR,500);
+  }
 }
 
 function shtoObjekt(){
@@ -916,11 +937,13 @@ function konfirmoObjekt(){
   var notiz=document.getElementById('obj-notiz').value.trim();
   if(!bez&&!nr){alert('Fut të paktën Projekt Nr. ose Emrin!');return;}
   gObjektet.push({nr:nr,bez:bez,taet:taet,notiz:notiz});
+  ruajObjektetEDites();
   perditesoObjekteLista();
   document.getElementById('shto-obj-form').classList.add('hide');
 }
 function hiqObjektin(i){
   gObjektet.splice(i,1);
+  ruajObjektetEDites();
   perditesoObjekteLista();
 }
 function perditesoObjekteLista(){
