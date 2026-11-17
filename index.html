@@ -531,11 +531,26 @@ function ngarkoLoginSel(){
     }
   });
 
-  // Rivendos nëse ishte i kyçur më parë
+  // Emri i fundit parazgjidhet, por PIN-i kerkohet GJITHMONE.
+  // Fshi cdo gjendje te vjetre te hyrjes.
   try{
     var kv = localStorage.getItem('fth_kycut');
     if(kv){ sel.value = kv; }
+    localStorage.removeItem('fth_kycut');
   }catch(e){}
+
+  // Sigurohu qe ekrani i hyrjes eshte i dukshem dhe app-i i fshehur
+  var ls=document.getElementById('login-screen');
+  var am=document.getElementById('app-main');
+  var nb=document.getElementById('nav-bot');
+  if(ls) ls.style.display='flex';
+  if(am) am.style.display='none';
+  if(nb) nb.style.display='none';
+  gPunetor=null;
+  gPinBuffer='';
+  perditesoDotat();
+  var le=document.getElementById('login-err');
+  if(le) le.textContent='';
 }
 
 function loginNdryshoPunetorin(){
@@ -576,6 +591,7 @@ function pinKonfirmo(){
   var pin_korrekt = merrPin(em);
   if(gPinBuffer===pin_korrekt){
     gPunetor=em;
+    // Emri mbahet mend per here tjeter, por PIN-i kerkohet gjithmone
     localStorage.setItem('fth_kycut',em);
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-main').style.display='block';
