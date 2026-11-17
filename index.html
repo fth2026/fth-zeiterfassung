@@ -650,7 +650,45 @@ function lexoObjektetEDites(){
   }catch(e){ return []; }
 }
 
-function nisObjektinNgaLinku(){function inicioApp(){
+function nisObjektinNgaLinku(){
+  var nr=objektNgaLinku();
+  if(!nr) return;
+  var ni=parseInt(nr);
+  var o=null;
+  try{ var p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');
+       if(!p||!p.length) p=OBJEKTET_BRENDA;
+       o=p.find(function(x){return x.nr==ni;}); }catch(e){}
+
+  var ka=false;
+  for(var i=0;i<gObjektet.length;i++){ if(String(gObjektet[i].nr)===String(ni)) ka=true; }
+  if(!ka){
+    gObjektet.push({nr:String(ni), bez:(o?o.name:''), taet:'Hausmeister', notiz:'nga QR'});
+    ruajObjektetEDites();
+    perditesoObjekteLista();
+  }
+  var info=document.getElementById('obj-info');
+  if(info) info.textContent = o ? '\u2714 Nga QR: ' + o.name + ' (' + gObjektet.length + ' objekte sot)' : '\u26a0 Objekti ' + ni;
+}
+
+function ruajObjektetEDites(){
+  try{
+    var sot=new Date();
+    var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+    localStorage.setItem(KEY_OD, JSON.stringify({datum:tag, objekte:gObjektet}));
+  }catch(e){}
+}
+
+function lexoObjektetEDites(){
+  try{
+    var d=JSON.parse(localStorage.getItem(KEY_OD)||'null');
+    if(!d || !d.objekte) return [];
+    var sot=new Date();
+    var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+    return (d.datum===tag) ? d.objekte : [];
+  }catch(e){ return []; }
+}
+
+function inicioApp(){
   var sot=new Date();
   document.getElementById('inp-datum').value=
     sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
