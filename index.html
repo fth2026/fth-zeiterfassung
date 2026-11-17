@@ -2,534 +2,1136 @@
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>FTH Hausmeister · QR</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FTH Zeiterfassung">
+<title>FTH Hausmeister · Zeiterfassung</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0d0d1a;--card:#16213e;--panel:#1a1a2e;--gold:#C8A84B;--cyan:#00BCD4;
---green:#27AE60;--red:#E74C3C;--gray:#8888AA;--white:#e8e8f0;--orange:#E67E22}
+:root{
+  --bg:#0d0d1a;--panel:#1a1a2e;--card:#16213e;
+  --gold:#C8A84B;--cyan:#00BCD4;--green:#27AE60;
+  --red:#E74C3C;--gray:#8888AA;--white:#e8e8f0;
+  --orange:#E67E22;
+}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
-background:var(--bg);color:var(--white);min-height:100vh;padding:14px;overflow-x:hidden}
-.karta{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;
-border:1px solid #2a2a50}
-.tit{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:10px}
-label{display:block;font-size:.78rem;color:var(--gray);margin:10px 0 5px;font-weight:600}
-select,input{width:100%;padding:13px;border-radius:10px;border:1px solid #2a2a50;
-background:#0d0d1a;color:var(--white);font-size:1rem}
-button{border:none;border-radius:12px;padding:16px;font-size:1rem;font-weight:700;
-width:100%;margin-top:10px;cursor:pointer}
-.b-green{background:var(--green);color:#fff}
-.b-red{background:var(--red);color:#fff}
-.b-cyan{background:var(--cyan);color:#081018}
-.b-gold{background:var(--gold);color:#1a1a2e}
-.b-gray{background:#2a2a50;color:var(--white)}
-.rresht{display:flex;gap:10px}
-.rresht button{margin-top:0}
-.obj{background:#0d0d1a;border-radius:10px;padding:11px 13px;margin-top:8px;
-display:flex;justify-content:space-between;align-items:center;border:1px solid #2a2a50}
-.obj.aktiv{border-color:var(--green);background:#0d2a1a}
-.obj-nr{font-weight:700;color:var(--gold);font-size:1rem;margin-right:8px}
-.obj-em{font-size:.8rem;flex:1}
-.obj-or{font-size:.85rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums}
-.ora-madhe{font-size:2.6rem;font-weight:700;color:var(--cyan);text-align:center;
-font-variant-numeric:tabular-nums;letter-spacing:2px;margin:6px 0}
-.qrbox{width:100%;max-width:320px;margin:8px auto;border-radius:12px;overflow:hidden}
-video{width:100%;display:block;background:#000}
-.hide{display:none!important}
-.st{font-size:.82rem;margin-top:8px;min-height:18px;text-align:center}
-.help{font-size:.72rem;color:var(--gray);margin-top:6px;text-align:center}
+  background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:999;padding:30px}
+.login-logo{font-size:3rem;margin-bottom:8px}
+.login-firma{font-size:1.4rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.login-sub{font-size:.85rem;color:var(--gray);margin-bottom:30px}
+.login-karta{background:var(--card);border-radius:16px;padding:24px;
+  width:100%;max-width:340px;border:1px solid #2a2a50}
+.login-lbl{font-size:.8rem;color:var(--gray);margin-bottom:8px;font-weight:600}
+.login-sel{width:100%;padding:13px;background:#0d0d1a;color:var(--white);
+  border:1px solid #2a2a50;border-radius:10px;font-size:1rem;
+  -webkit-appearance:none;margin-bottom:14px}
+.login-lbl-pin{font-size:.8rem;color:var(--gray);margin-bottom:8px;font-weight:600}
+.pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:#2a2a50;
+  transition:.15s;flex-shrink:0}
+.pin-dot.aktiv{background:var(--cyan)}
+.pin-pad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pin-btn{background:#1a1a2e;border:1px solid #2a2a50;border-radius:12px;
+  color:var(--white);font-size:1.3rem;font-weight:700;padding:16px;
+  cursor:pointer;transition:.15s;text-align:center;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;
+  -webkit-appearance:none;appearance:none;
+  display:flex;align-items:center;justify-content:center;width:100%}
+.pin-btn:active,.pin-btn:focus{background:#2a2a50;outline:none}
+.pin-btn.fshi{color:var(--red);font-size:1rem}
+.login-err{color:var(--red);font-size:.82rem;text-align:center;
+  margin-top:10px;min-height:20px;font-weight:600}
+.login-hint{font-size:.72rem;color:#3a3a5a;text-align:center;margin-top:8px}
+
+/* ── HEADER ── */
+.hdr{background:var(--panel);border-bottom:2px solid var(--gold);
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-title{font-size:1rem;font-weight:700;color:var(--gold)}
+.hdr-user{font-size:.78rem;color:var(--cyan)}
+.hdr-time{font-size:.82rem;color:var(--gray);font-variant-numeric:tabular-nums}
+.btn-logout{background:#2a1a1a;border:1px solid var(--red);color:var(--red);
+  border-radius:6px;padding:5px 10px;font-size:.72rem;cursor:pointer}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--panel);border-bottom:1px solid #2a2a50;
+  position:sticky;top:52px;z-index:99}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:.85rem;font-weight:600;
+  color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:.2s}
+.tab.aktiv{color:var(--cyan);border-bottom-color:var(--cyan)}
+.tab.aktiv.plan{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── FAQET ── */
+.faqe{display:none;padding:12px 12px 80px}
+.faqe.aktiv{display:block}
+
+/* ── KARTAT ── */
+.karta{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;
+  border:1px solid #2a2a50}
+.karta-titull{font-size:.78rem;font-weight:700;color:var(--cyan);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.karta-titull.gold{color:var(--gold)}
+
+/* ── FORMA ── */
+label{display:block;font-size:.74rem;color:var(--gray);margin-bottom:3px;
+  margin-top:10px;font-weight:600}
+label:first-child{margin-top:0}
+input,select{width:100%;padding:10px 12px;background:#0d0d1a;color:var(--white);
+  border:1px solid #2a2a50;border-radius:8px;font-size:.92rem;outline:none;
+  -webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:var(--cyan)}
+.inp-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ── MODE ── */
+.mode-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.mode-btn{padding:10px;text-align:center;border-radius:8px;font-size:.85rem;
+  font-weight:700;cursor:pointer;border:2px solid #2a2a50;
+  background:var(--panel);color:var(--gray);transition:.2s}
+.mode-btn.sel-arbeit{background:#0d1f3e;color:var(--cyan);border-color:var(--cyan)}
+.mode-btn.sel-abwes{background:#2a0a0a;color:var(--red);border-color:var(--red)}
+.hide{display:none}
+
+/* ── OBJEKTE MULTIPLE ── */
+.objekte-lista{margin-top:8px}
+.objekt-item{background:#0d0d1a;border-radius:8px;padding:9px 12px;
+  margin-bottom:6px;border-left:3px solid var(--cyan);
+  display:flex;align-items:center;justify-content:space-between}
+.objekt-info{flex:1;font-size:.82rem}
+.objekt-ore{color:var(--gold);font-weight:700;font-size:.85rem}
+.btn-rm-obj{background:none;border:none;color:var(--red);font-size:1rem;
+  cursor:pointer;padding:4px 8px}
+.btn-shto-obj{width:100%;padding:9px;background:#0d1f14;color:var(--green);
+  border:1px dashed var(--green);border-radius:8px;cursor:pointer;
+  font-size:.85rem;font-weight:600;margin-top:6px}
+
+/* ── BUTONAT ── */
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:.92rem;
+  font-weight:700;cursor:pointer;margin-top:8px;transition:.15s}
+.btn-cyan{background:var(--cyan);color:#0a0a14}
+.btn-green{background:var(--green);color:#fff}
+.btn-gold{background:var(--gold);color:#1a1a2e}
+.btn-gray{background:#2a2a50;color:var(--white)}
+.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:8px 13px;font-size:.8rem;width:auto;margin-top:0}
+.btn-row{display:flex;gap:8px;margin-top:8px}
+.btn-row .btn{margin-top:0}
+
+/* ── STATUS ── */
+.status{padding:9px 12px;border-radius:8px;font-size:.82rem;margin-top:8px;
+  display:none;font-weight:600}
+.status.suksess{background:#0d2a1a;color:var(--green);border:1px solid var(--green);display:block}
+.status.gabim{background:#2a0a0a;color:var(--red);border:1px solid var(--red);display:block}
+.status.info{background:#1a1a2e;color:var(--cyan);border:1px solid var(--cyan);display:block}
+
+/* ── LISTA HYRJEVE ── */
+.hyrja-item{background:#0d0d1a;border-radius:8px;padding:9px 11px;
+  margin-bottom:5px;border-left:3px solid var(--cyan);
+  display:flex;align-items:flex-start;justify-content:space-between}
+.hyrja-item.abwes{border-left-color:var(--red)}
+.hyrja-info{flex:1;font-size:.8rem}
+.hyrja-data{color:var(--gray);font-size:.74rem}
+.hyrja-ore{font-weight:700;color:var(--cyan);margin:2px 0}
+.hyrja-proj{color:var(--gold);font-size:.75rem}
+.hyrja-multi{color:#8888aa;font-size:.72rem;margin-top:2px}
+.btn-fshi-s{background:#2a0a0a;color:var(--red);border:none;border-radius:5px;
+  padding:4px 8px;font-size:.72rem;cursor:pointer;margin-left:6px;flex-shrink:0}
+
+/* ── TOTALI ── */
+.tot-bar{background:var(--panel);border-radius:10px;padding:11px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;
+  text-align:center;margin-bottom:10px}
+.tot-nr{font-size:1.3rem;font-weight:700;color:var(--gold)}
+.tot-lbl{font-size:.62rem;color:var(--gray);margin-top:1px;text-transform:uppercase}
+
+/* ── PLANIFIKIMI ── */
+.plan-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nav-btn{background:#2a2a50;border:none;color:var(--white);
+  border-radius:8px;padding:8px 16px;font-size:1rem;cursor:pointer}
+.plan-titull{font-size:.95rem;font-weight:700;color:var(--gold)}
+.plan-stats{display:flex;gap:7px;margin-bottom:10px}
+.ps{flex:1;background:var(--card);border-radius:8px;padding:9px;
+  text-align:center;border:1px solid #2a2a50}
+.ps .n{font-size:1.2rem;font-weight:700;color:var(--gold)}
+.ps .l{font-size:.62rem;color:var(--gray);margin-top:1px}
+.dite-item{background:var(--panel);border-radius:9px;margin-bottom:5px;
+  padding:10px 12px;border-left:4px solid #2a2a50;display:flex;gap:10px}
+.dite-item.busy{border-left-color:var(--green);background:#0d1f14}
+.dite-item.sot{border-left-color:var(--gold);background:#1f1500}
+.dite-item.wknd{opacity:.38}
+.d-nr-kol{min-width:32px;text-align:center}
+.d-nr{font-size:1.1rem;font-weight:700}
+.d-em{font-size:.62rem;color:var(--gray)}
+.dite-item.busy .d-nr{color:var(--green)}
+.dite-item.sot .d-nr{color:var(--gold)}
+.d-det{flex:1}
+.proj-em{font-size:.88rem;font-weight:600;color:#00ee99}
+.proj-sh{font-size:.73rem;color:var(--gold);margin-top:2px}
+.lire{font-size:.8rem;color:#3a3a5a;font-style:italic}
+.badge-sot{background:var(--gold);color:#0d0d1a;font-size:.56rem;
+  font-weight:700;padding:2px 5px;border-radius:5px;margin-left:5px;vertical-align:middle}
+
+/* ── IMPORT SEKSION ── */
+textarea{width:100%;height:75px;background:#0d0d1a;color:var(--white);
+  border:1px solid #2a2a50;border-radius:8px;padding:9px;font-size:.78rem;
+  resize:vertical;outline:none;margin-top:4px}
+
+/* ── NAV BOT ── */
+.nav-bot{position:fixed;bottom:0;left:0;right:0;background:var(--panel);
+  border-top:1px solid #2a2a50;display:flex;z-index:200}
+.nb-btn{flex:1;padding:11px 6px;text-align:center;cursor:pointer;
+  font-size:.7rem;color:var(--gray);transition:.2s}
+.nb-btn.aktiv{color:var(--cyan)}
+.nb-btn.aktiv.plan{color:var(--gold)}
+.nb-ico{font-size:1.25rem;display:block;margin-bottom:1px}
+
+.filter-row{display:flex;gap:7px;align-items:center;margin-bottom:8px}
+.filter-row input,.filter-row select{flex:1;padding:8px 10px;font-size:.82rem}
+.bosh{text-align:center;padding:30px 16px;color:var(--gray)}
+.bosh-ico{font-size:2.2rem;margin-bottom:8px}
 </style>
 </head>
-<body>
+<body ontouchstart="">
 
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="login-screen">
+  <div class="login-logo">⚙</div>
+  <div class="login-firma">FTH PRO 2026</div>
+  <div class="login-sub">Zeiterfassung · Sistemi i Orëve</div>
 
-<div class="karta" id="ekrani-hyrje">
-  <div class="tit">🔐 Hyrja e punëtorit</div>
-  <label>Zgjidh emrin tënd</label>
-  <select id="login-punetori">
-    <option value="">— Zgjidh punëtorin —</option>
-  </select>
-  <label>Fut PIN-in (4 shifra)</label>
-  <input type="password" id="login-pin" maxlength="4" inputmode="numeric"
-         placeholder="••••" style="text-align:center;font-size:1.6rem;letter-spacing:10px">
-  <button class="b-cyan" onclick="hyj()">🔓 Hyr</button>
-  <div class="st" id="st-login"></div>
-  <div class="help">PIN-i fillestar: 1234 · ndryshoje te Cilësimet</div>
-</div>
+  <div class="login-karta">
+    <div class="login-lbl">Zgjidh emrin tënd:</div>
+    <select id="login-sel" onchange="loginNdryshoPunetorin()">
+      <option value="">— Zgjidh punëtorin —</option>
+      <option value="Fahrush Thaqi">Fahrush Thaqi</option>
+      <option value="Avdyl Thaqi">Avdyl Thaqi</option>
+      <option value="Arber Selmani">Arber Selmani</option>
+    </select>
 
-<div id="faqja-kryesore" class="hide">
-<div class="karta">
-  <div class="tit">👷 FTH Hausmeister · QR</div>
-  <label>Punëtori</label>
-  <select id="punetori"></select>
-  <div class="ora-madhe" id="ora-now">--:--:--</div>
-  <div class="help" id="dita"></div>
-  <button class="b-gray" onclick="dale()" style="margin-top:8px">🚪 Dil</button>
-</div>
+    <div class="login-lbl-pin">Fut PIN-in (4 shifra):</div>
+    <div class="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
 
-<div class="karta">
-  <div class="tit">📋 Zgjidh objektin</div>
-  <select id="zgjedh-obj" onchange="zgjidhObjektin(this.value)">
-    <option value="">— Prek objektin —</option>
-  </select>
-  <div class="st" id="st-skan"></div>
-  <label>Ose shkruaj numrin (p.sh. 1001)</label>
-  <div class="rresht">
-    <input type="number" id="nr-dore" placeholder="1001" style="flex:2">
-    <button class="b-gold" style="flex:1" onclick="filloMeNumer()">▶ Nis</button>
+    <div class="pin-pad">
+      <button type="button" class="pin-btn" onclick="pinShtyp('1')">1</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('2')">2</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('3')">3</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('4')">4</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('5')">5</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('6')">6</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('7')">7</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('8')">8</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('9')">9</button>
+      <button type="button" class="pin-btn fshi" onclick="pinFshi()">⌫</button>
+      <button type="button" class="pin-btn" onclick="pinShtyp('0')">0</button>
+      <button type="button" class="pin-btn" onclick="pinKonfirmo()" style="background:#0d2a1a;color:var(--green);border-color:var(--green)">✔</button>
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">PIN-i fillestar: 1234 · Ndrysho te Cilësimet</div>
   </div>
 </div>
 
-<div class="karta">
-  <div class="tit">⚙ Cilësimet</div>
-  <label>PIN-i aktual</label>
-  <input type="password" id="pin-old" maxlength="4" inputmode="numeric" placeholder="••••">
-  <label>PIN-i i ri (4 shifra)</label>
-  <input type="password" id="pin-new" maxlength="4" inputmode="numeric" placeholder="••••">
-  <button class="b-cyan" onclick="ndryshoPin()">🔐 Ndrysho PIN-in</button>
-  <div class="st" id="st-pin"></div>
+<!-- ════ APP KRYESORE ════ -->
+<div id="app-main" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div>
+      <div class="hdr-title">⚙ FTH Zeiterfassung</div>
+      <div class="hdr-user" id="hdr-user"></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="hdr-time" id="ora-live"></div>
+    <div class="btn-logout" onclick="logout()">Dil</div>
+  </div>
 </div>
 
-<div class="karta">
-  <div class="tit">🏠 Mungesa / Abwesenheit</div>
-  <label>Arsyeja</label>
-  <select id="ab-arsye">
-    <option>Krank (Sëmurë)</option>
-    <option>Urlaub (Pushim)</option>
-    <option>Homeoffice</option>
-    <option>Elternzeit</option>
-    <option>Arzttermin</option>
-    <option>Sonstiges (Tjetër)</option>
-  </select>
-  <label>Kohëzgjatja</label>
-  <select id="ab-dite">
-    <option>1 ditë e plotë</option>
-    <option>0.5 gjysmë dite</option>
-    <option>2 ditë</option>
-    <option>3 ditë</option>
-    <option>1 javë</option>
-  </select>
-  <label>Shënim</label>
-  <input type="text" id="ab-notiz" placeholder="Shënim i lirë...">
-  <button class="b-red" onclick="ruajMungesen()">💾 Ruaj mungesën</button>
-  <div class="st" id="st-abwes"></div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab aktiv" id="tab-zeit" onclick="hapTab('zeit')">⏱ Orët</div>
+  <div class="tab" id="tab-plan" onclick="hapTab('plan')">📅 Plani Im</div>
+  <div class="tab" id="tab-set" onclick="hapTab('set')">⚙ Cilësimet</div>
 </div>
 
-<div class="karta">
-  <div class="tit">⏱ Objektet e sotme</div>
-  <div id="lista"></div>
-  <div class="rresht" style="margin-top:12px">
-    <button class="b-red" onclick="mbylleDiten()">⏹ Mbyll ditën</button>
+<!-- ════ TAB 1: ZEITERFASSUNG ════ -->
+<div class="faqe aktiv" id="faqe-zeit">
+
+  <!-- Mode -->
+  <div class="karta">
+    <div class="karta-titull">📝 Hyrja e Re</div>
+    <div class="mode-row">
+      <div class="mode-btn sel-arbeit" id="mb-arbeit" onclick="setMode('arbeit')">🔨 Punë</div>
+      <div class="mode-btn" id="mb-abwes" onclick="setMode('abwes')">🏠 Mungesë</div>
+    </div>
+
+    <label>Datë</label>
+    <input type="date" id="inp-datum">
+
+    <!-- SEKSIONI PUNË -->
+    <div id="sek-arbeit">
+      <div class="inp-row">
+        <div><label>Fillimi</label><input type="time" id="inp-von" value="07:00"></div>
+        <div><label>Fundi</label><input type="time" id="inp-bis" value="16:00"></div>
+        <div><label>Pushim(min)</label><input type="number" id="inp-pause" value="30" min="0"></div>
+      </div>
+
+      <!-- OBJEKTE MULTIPLE -->
+      <label>Objektet e punuara sot:</label>
+      <div class="objekte-lista" id="objekte-lista"></div>
+      <button class="btn-shto-obj" onclick="shtoObjekt()">➕ Shto Objekt / Projekt</button>
+
+      <!-- Modal shto objekt -->
+      <div id="shto-obj-form" class="hide" style="background:#0d0d1a;border-radius:10px;padding:12px;margin-top:8px;border:1px solid #2a2a50">
+        <label>Objekt (zgjidh nga lista)</label>
+        <select id="obj-lista" onchange="zgjidhNgaLista(this.value)"
+                style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a2a50;background:#0d0d1a;color:#e8e8f0;font-size:.9rem">
+          <option value="">— Zgjidh objektin —</option>
+        </select>
+        <label style="margin-top:8px">Objekt Nr.</label>
+        <input type="number" id="obj-nr" placeholder="p.sh. 1001" oninput="kerkoObj(this.value)">
+        <div id="obj-info" style="font-size:.74rem;color:var(--gray);margin:3px 0 6px;min-height:16px"></div>
+        <label>Tätigkeit</label>
+        <select id="obj-taet">
+          <option>Hausmeister</option>
+        </select>
+        <label>Objekt Emri</label>
+        <input type="text" id="obj-bez" placeholder="Emri i objektit">
+        <label>Shënim</label>
+        <input type="text" id="obj-notiz" placeholder="Shënim i lirë...">
+        <button class="btn btn-gold" onclick="hapQR()" style="margin-top:8px">📷 Skano QR-në e objektit</button>
+        <div class="qr-wrap hide" id="qr-wrap" style="margin-top:8px">
+          <video id="qr-video" playsinline muted
+                 style="width:100%;border-radius:10px;background:#000"></video>
+        </div>
+        <div class="status" id="st-qr" style="margin-top:6px"></div>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn-green" onclick="konfirmoObjekt()" style="margin-top:0">✔ Shto</button>
+          <button class="btn btn-gray" onclick="anulloObjekt()" style="margin-top:0">✕ Anulo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEKSIONI MUNGESË -->
+    <div id="sek-abwes" class="hide">
+      <label>Arsyeja</label>
+      <select id="inp-abgrund">
+        <option>Krank - Sëmurë</option><option>Urlaub - Pushim</option>
+        <option>Homeoffice</option><option>Elternzeit</option>
+        <option>Arzttermin</option><option>Sonstiges - Tjetër</option>
+      </select>
+      <label>Ditë</label>
+      <select id="inp-ab-dite">
+        <option>1 ditë e plotë</option><option>0.5 gjysmë dite</option>
+        <option>2 ditë</option><option>3 ditë</option><option>1 javë</option>
+      </select>
+    </div>
+
+    <button class="btn btn-green" onclick="ruajHyrjen()">💾 Ruaj Hyrjen</button>
+    <div class="status" id="st-ruaj"></div>
   </div>
-  <div class="rresht" style="margin-top:8px">
-    <button class="b-gray" onclick="shfaqTeGjithe()">👥 Të gjithë punëtorët</button>
-    <button class="b-gray" onclick="shfaqVetemMua()">👤 Vetëm unë</button>
+
+  <!-- Totali + Lista -->
+  <div id="tot-sek" style="display:none">
+    <div class="tot-bar">
+      <div><div class="tot-nr" id="tot-dite">0</div><div class="tot-lbl">Ditë</div></div>
+      <div><div class="tot-nr" id="tot-ore">0h</div><div class="tot-lbl">Orë Neto</div></div>
+      <div><div class="tot-nr" id="tot-mes">0h</div><div class="tot-lbl">Mesatare</div></div>
+    </div>
   </div>
-  <div class="rresht" style="margin-top:8px">
-    <button class="b-green" onclick="eksportoCSV()">📤 Eksporto Excel</button>
-    <button class="b-gold" onclick="eksportoJSONlaptop()">💾 Ruaj JSON (OneDrive)</button>
-    <button class="b-gray" id="btn-fshi" onclick="fshiDiten()">🗑 Fshi</button>
+
+  <div class="karta">
+    <div class="karta-titull">📋 Evidenca</div>
+    <div class="filter-row">
+      <input type="month" id="filt-muaj" style="flex:1">
+      <button class="btn btn-gray btn-sm" onclick="filtro()">Filtro</button>
+      <button class="btn btn-gray btn-sm" onclick="shfaqTeGjitha()">Të gjitha</button>
+    </div>
+    <div id="lista-h"></div>
   </div>
-  <textarea id="eksport" class="hide" rows="7" readonly
-    style="width:100%;margin-top:10px;font-size:.7rem;font-family:monospace;background:#0d0d1a;color:#e8e8f0;border:1px solid #2a2a50;border-radius:8px;padding:8px"></textarea>
-  <div class="st" id="st-auto"></div>
-  <div class="st" id="st-lista"></div>
+
+  <!-- Import/Eksport -->
+  <div class="karta">
+    <div class="karta-titull">🔄 Sinkronizim me PC</div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="eksportoJSON()" style="flex:1">📤 Eksporto JSON</button>
+      <button class="btn btn-gray" onclick="toggleImport()" style="flex:1">📥 Importo</button>
+    </div>
+    <div id="import-sek" class="hide" style="margin-top:8px">
+      <label>Ngjit JSON nga PC:</label>
+      <textarea id="import-ta" placeholder='[{"id":"..."}]'></textarea>
+      <button class="btn btn-green" onclick="importoJSON()" style="margin-top:6px">✔ Importo Orët</button>
+    </div>
+    <div style="margin-top:8px">
+      <label>Importo Objektet (nga PC → Eksporto Objektet):</label>
+      <textarea id="import-proj" placeholder='[{"nr":1003,"name":"Objekt Müller",...}]'></textarea>
+      <button class="btn btn-cyan" onclick="importoProjektet()" style="margin-top:6px">🏗 Importo Objektet</button>
+    </div>
+    <div class="status" id="st-import"></div>
+  </div>
+
+</div><!-- /faqe-zeit -->
+
+
+<!-- ════ TAB 2: PLANI IM ════ -->
+<div class="faqe" id="faqe-plan">
+
+  <div class="plan-nav">
+    <button class="nav-btn" onclick="ndryshojMuajin(-1)">◀</button>
+    <div class="plan-titull" id="plan-titull">—</div>
+    <button class="nav-btn" onclick="ndryshojMuajin(+1)">▶</button>
+  </div>
+
+  <div class="plan-stats hide" id="plan-stats">
+    <div class="ps"><div class="n" id="ps-p">0</div><div class="l">Me Punë</div></div>
+    <div class="ps"><div class="n" id="ps-l">0</div><div class="l">I Lirë</div></div>
+    <div class="ps"><div class="n" id="ps-t">0</div><div class="l">Gjithsej</div></div>
+  </div>
+
+  <div id="plan-lista">
+    <div class="bosh"><div class="bosh-ico">📅</div><div>Duke ngarkuar planin...</div></div>
+  </div>
+
+  <!-- Importo Planin -->
+  <div class="karta" style="margin-top:12px">
+    <div class="karta-titull gold">📥 Importo Planin nga PC</div>
+    <p style="font-size:.76rem;color:var(--gray);margin-bottom:8px">
+      Në PC: Planifikimi → Eksporto për Celular → kopjo planifikimi_web.json
+    </p>
+    <textarea id="import-plan-ta" placeholder='{"puntoret":{"Fahrush Thaqi":{"ditet":[...]}}}'></textarea>
+    <button class="btn btn-gold" onclick="importoPlanin()" style="margin-top:6px">📅 Ngarko Planin</button>
+    <div class="status" id="st-plan"></div>
+  </div>
+
+</div><!-- /faqe-plan -->
+
+
+<!-- ════ TAB 3: CILËSIMET ════ -->
+<div class="faqe" id="faqe-set">
+
+  <div class="karta">
+    <div class="karta-titull gold">🔐 Ndrysho PIN-in Tim</div>
+    <label>PIN-i aktual</label>
+    <input type="password" id="pin-old" maxlength="4" placeholder="••••" inputmode="numeric">
+    <label>PIN-i i ri (4 shifra)</label>
+    <input type="password" id="pin-new1" maxlength="4" placeholder="••••" inputmode="numeric">
+    <label>Konfirmo PIN-in e ri</label>
+    <input type="password" id="pin-new2" maxlength="4" placeholder="••••" inputmode="numeric">
+    <button class="btn btn-cyan" onclick="ndryshoPin()" style="margin-top:10px">✔ Ruaj PIN-in</button>
+    <div class="status" id="st-pin"></div>
+  </div>
+
+  <div class="karta">
+    <div class="karta-titull">👷 Punëtorët</div>
+    <p style="font-size:.76rem;color:var(--gray);margin-bottom:10px">
+      Lista e punëtorëve vjen nga PC (Zeiterfassung → ➕ Shto Punëtor)
+    </p>
+    <label>Importo listën e punëtorëve (nga PC → Punetoret.json):</label>
+    <textarea id="import-pt-ta" placeholder='["Fahrush Thaqi","Avdyl Thaqi","Arber Selmani"]'></textarea>
+    <button class="btn btn-green" onclick="importoPunetoret()" style="margin-top:6px">✔ Importo</button>
+    <div class="status" id="st-pt"></div>
+  </div>
+
+  <div class="karta">
+    <div class="karta-titull" style="color:var(--red)">⚠ Fshi të Dhënat</div>
+    <button class="btn btn-gray" onclick="fshiTeGjitha()" style="margin-top:4px">🗑 Fshi Të Gjitha Hyrjet e Mia</button>
+  </div>
+
+</div><!-- /faqe-set -->
+
+</div><!-- /app-main -->
+
+<!-- NAV BOTTOM -->
+<div class="nav-bot" id="nav-bot" style="display:none">
+  <div class="nb-btn aktiv" id="nb-zeit" onclick="hapTab('zeit')">
+    <span class="nb-ico">⏱</span>Orët
+  </div>
+  <div class="nb-btn" id="nb-plan" onclick="hapTab('plan')">
+    <span class="nb-ico">📅</span>Plani Im
+  </div>
+  <div class="nb-btn" id="nb-set" onclick="hapTab('set')">
+    <span class="nb-ico">⚙</span>Cilësimet
+  </div>
 </div>
 
 <script>
-var OBJEKTET = [{"nr": 1001, "name": "Reinigung wie nach Plan", "klient": "Kindertageseinrichtung Sonnenschein"}, {"nr": 1002, "name": "Röllfeld, Steigweg 1", "klient": "Gies Immobilien GmbH"}, {"nr": 1003, "name": "Wörth am Main, Galgenstr. 6", "klient": "Praxis Dr. Plattner Dr. Vogel Dr. Ide"}, {"nr": 1004, "name": "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a", "klient": "PETERS GmbH"}, {"nr": 1005, "name": "Laudenbach, Mühlweg 51", "klient": "Gies Immobilien GmbH"}, {"nr": 1006, "name": "Obernburg, Obere Wallstr. 17-19", "klient": "AB-Hausverwaltung Wolf"}, {"nr": 1007, "name": "Klingenberg, Wilhelmstr. 63", "klient": "Markus Krall"}, {"nr": 1008, "name": "Wörth am Main, Beethovenstr. 2b", "klient": "Vereinigte Schiffs-Versicherung V.A.G"}, {"nr": 1009, "name": "Wörth am Main, Frühlingsstr. 13a - 13b", "klient": "Eva Schroll"}, {"nr": 1010, "name": "Wörth am Main, Moosgraben 25", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1011, "name": "Wörth am Main, Odenwaldstr. 30", "klient": "Ulrich Möller"}, {"nr": 1012, "name": "Haibach, Ludwigstr. 11", "klient": "Dieter Zang"}, {"nr": 1013, "name": "Wörth am Main, Presentstr. 19", "klient": "algeb awell GmbH"}, {"nr": 1014, "name": "Kleinheubach, Kastellstr. 11a", "klient": "Main Immo Team GmbH"}, {"nr": 1015, "name": "Wörth am Main, Erlenstr. 9", "klient": "Ismail Sezer"}, {"nr": 1016, "name": "Kleinheubach, Jahnstr. 17", "klient": "WEG Jahnstr. 17 c/o Perfect Living"}, {"nr": 1017, "name": "Wörth am Main, Presentstr. 18", "klient": "Firma Klein Zügner Gbr c/o Eilbacher"}, {"nr": 1018, "name": "Großwallstadt, Quellenstr. 5", "klient": "Main Immo Team GmbH"}, {"nr": 1019, "name": "Wörth am Main, Landstr. 78", "klient": "Erbengemeinschaft Wolf"}, {"nr": 1020, "name": "Elsenfeld, Hoffeldstraße 39", "klient": "Main Immo Team GmbH"}, {"nr": 1021, "name": "Elsenfeld, Finkenweg 14", "klient": "Immobilien Hausverwaltung Schultz GmbH"}, {"nr": 1022, "name": "Elsendelf, Droselweg 17", "klient": "Immobilien Hausverwaltung Schultz GmbH"}];
-var KEY_H = 'fth_hm_hyrjet';
-var KEY_P = 'fth_hm_punetori';
-var gHyrjet = [];
-var gTeGjithe = false;
+// ═══════════════════════════════════════════
+//  PINAT E PARACAKTUARA — Ndrysho sipas dëshirës
+//  FORMAT: { "Emri Mbiemri": "1234" }
+// ═══════════════════════════════════════════
+var PINAT_DEFAULT = {
+  "Fahrush Thaqi": "1111",
+  "Avdyl Thaqi":   "2222",
+  "Arber Selmani": "3333",
+};
 
-function dy(v){return (v<10?'0':'')+v;}
-function oraTani(){
-  var d=new Date();
-  return dy(d.getHours())+':'+dy(d.getMinutes())+':'+dy(d.getSeconds());
-}
-function dataSot(){
-  var d=new Date();
-  return dy(d.getDate())+'.'+dy(d.getMonth()+1)+'.'+d.getFullYear();
-}
-function dataISO(){
-  var d=new Date();
-  return d.getFullYear()+'-'+dy(d.getMonth()+1)+'-'+dy(d.getDate());
-}
-function minutaTe(iso){
-  var d=new Date(iso);
-  return Math.floor((Date.now()-d.getTime())/60000);
-}
-function oreDheMin(iso){
-  var m=minutaTe(iso);
-  return Math.floor(m/60)+'h '+dy(m%60)+'m';
-}
-function gjejObjektin(nr){
-  nr=parseInt(nr);
-  for(var i=0;i<OBJEKTET.length;i++) if(OBJEKTET[i].nr===nr) return OBJEKTET[i];
-  return null;
-}
-function ngarkoPunetoret(){
-  var sel=document.getElementById('punetori');
-  var html='';
-  for(var i=0;i<PUNETORET.length;i++){
-    html+='<option>' + PUNETORET[i] + '</option>';
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+var gMode       = 'arbeit';
+var gPunetor    = '';
+var gPlanMuaji  = new Date().getMonth()+1;
+var gPlanViti   = new Date().getFullYear();
+var gPinBuffer  = '';
+var gObjektet   = [];  // objekte të punuara gjatë ditës
+var gFiltro     = null;
+
+var KEY_H   = 'fth_hyrjet';
+var KEY_PR  = 'fth_projektet';
+var KEY_PT  = 'fth_punetoret';
+var KEY_PIN = 'fth_pinat';
+var KEY_PL  = 'fth_plan';
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+window.addEventListener('load', function(){
+  ngarkoLoginSel();
+  setInterval(function(){
+    var n=new Date();
+    var el=document.getElementById('ora-live');
+    if(el) el.textContent=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+  },1000);
+});
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+// ═══════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════
+function ngarkoLoginSel(){
+  var sel = document.getElementById('login-sel');
+  var lista = merrPunetoret();
+
+  // Mbaj emrat e kodifikuar në HTML dhe shto vetëm ata që mungojnë nga localStorage
+  // Kjo siguron që emrat shfaqen gjithmonë, edhe pa JavaScript
+  var ekzistues = [];
+  for(var i=1; i<sel.options.length; i++){
+    ekzistues.push(sel.options[i].value);
   }
-  sel.innerHTML=html;
-}
-function merrHyrjet(){
-  try{ gHyrjet=JSON.parse(localStorage.getItem(KEY_H)||'[]'); }catch(e){ gHyrjet=[]; }
-  var sot=dataISO();
-  gHyrjet=gHyrjet.filter(function(h){return h.data===sot;});
-  if(gPunetor && !gTeGjithe){ gHyrjet=gHyrjet.filter(function(h){return (h.punetori||h.mitarbeiter)===gPunetor;}); }
-}
-function ruajHyrjet(){
-  var te_gjitha=[];
-  try{ te_gjitha=JSON.parse(localStorage.getItem(KEY_H)||'[]'); }catch(e){}
-  var sot=dataISO();
-  te_gjitha=te_gjitha.filter(function(h){return h.data!==sot;});
-  for(var i=0;i<gHyrjet.length;i++) te_gjitha.push(gHyrjet[i]);
-  localStorage.setItem(KEY_H,JSON.stringify(te_gjitha));
+  lista.forEach(function(em){
+    if(ekzistues.indexOf(em) < 0){
+      var o = document.createElement('option');
+      o.value = em; o.textContent = em; sel.appendChild(o);
+    }
+  });
+
+  // Rivendos nëse ishte i kyçur më parë
+  try{
+    var kv = localStorage.getItem('fth_kycut');
+    if(kv){ sel.value = kv; }
+  }catch(e){}
 }
 
+function loginNdryshoPunetorin(){
+  gPinBuffer='';
+  perditesoDotat();
+  document.getElementById('login-err').textContent='';
+}
 
-var gPunetor = null;
-var KEY_PIN = 'fth_pin';
-var PUNETORET = ['Fahrush Thaqi','Avdyl Thaqi','Arber Selmani'];
+function pinShtyp(s){
+  if(gPinBuffer.length>=4) return;
+  gPinBuffer+=s;
+  perditesoDotat();
+  if(gPinBuffer.length===4) setTimeout(pinKonfirmo,150);
+}
 
-function mbushLogin(){
-  var sel=document.getElementById('login-punetori');
-  var ruajtur=localStorage.getItem('fth_punetori');
-  var html='<option value="">— Zgjidh punëtorin —</option>';
-  for(var i=0;i<PUNETORET.length;i++){
-    html+='<option value="'+PUNETORET[i]+'"'+(ruajtur===PUNETORET[i]?' selected':'')+'>'+PUNETORET[i]+'</option>';
+function pinFshi(){
+  gPinBuffer=gPinBuffer.slice(0,-1);
+  perditesoDotat();
+}
+
+function perditesoDotat(){
+  for(var i=0;i<4;i++){
+    var el=document.getElementById('pd'+i);
+    if(el) el.className='pin-dot'+(i<gPinBuffer.length?' aktiv':'');
   }
-  sel.innerHTML=html;
+}
+
+function pinKonfirmo(){
+  var em = document.getElementById('login-sel').value;
+  if(!em){
+    document.getElementById('login-err').textContent='⚠ Zgjidh emrin tënd!';
+    gPinBuffer=''; perditesoDotat(); return;
+  }
+  if(gPinBuffer.length<4){
+    document.getElementById('login-err').textContent='⚠ Fut 4 shifra!';
+    return;
+  }
+  var pin_korrekt = merrPin(em);
+  if(gPinBuffer===pin_korrekt){
+    gPunetor=em;
+    localStorage.setItem('fth_kycut',em);
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-main').style.display='block';
+    document.getElementById('nav-bot').style.display='flex';
+    document.getElementById('hdr-user').textContent='👤 '+em;
+    inicioApp();
+  } else {
+    document.getElementById('login-err').textContent='⚠ PIN i gabuar! Provo sërisht.';
+    gPinBuffer=''; perditesoDotat();
+    setTimeout(function(){ document.getElementById('login-err').textContent=''; },2500);
+  }
 }
 
 function merrPin(em){
   try{
     var p=JSON.parse(localStorage.getItem(KEY_PIN)||'{}');
-    return p[em]||'1234';
-  }catch(e){ return '1234'; }
+    return p[em]||PINAT_DEFAULT[em]||'1234';
+  }catch(e){ return PINAT_DEFAULT[em]||'1234'; }
 }
 
-function hyj(){
-  var em=document.getElementById('login-punetori').value;
-  var pin=document.getElementById('login-pin').value;
-  if(!em){ document.getElementById('st-login').textContent='⚠ Zgjidh emrin!'; return; }
-  if(pin.length!==4){ document.getElementById('st-login').textContent='⚠ PIN-i ka 4 shifra!'; return; }
-  if(pin!==merrPin(em)){ document.getElementById('st-login').textContent='⚠ PIN i gabuar!'; return; }
-  gPunetor=em;
-  localStorage.setItem('fth_punetori', em);
-  document.getElementById('ekrani-hyrje').classList.add('hide');
-  document.getElementById('faqja-kryesore').classList.remove('hide');
-  document.getElementById('punetori').value=em;
-  gHyrjet=[]; merrHyrjet(); mbushListen(); vizato();
-  document.getElementById('st-login').textContent='';
-  document.getElementById('login-pin').value='';
+function logout(){
+  if(!confirm('Dëshiron të dalësh?')) return;
+  gPunetor='';
+  gPinBuffer=''; perditesoDotat();
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-main').style.display='none';
+  document.getElementById('nav-bot').style.display='none';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('login-sel').value='';
 }
 
-function ndryshoPin(){
-  var old=document.getElementById('pin-old').value;
-  var ri=document.getElementById('pin-new').value;
-  if(old!==merrPin(gPunetor)){ document.getElementById('st-pin').textContent='⚠ PIN-i aktual gabim!'; return; }
-  if(ri.length!==4){ document.getElementById('st-pin').textContent='⚠ PIN-i i ri ka 4 shifra!'; return; }
-  var p={};
-  try{ p=JSON.parse(localStorage.getItem(KEY_PIN)||'{}'); }catch(e){}
-  p[gPunetor]=ri;
-  localStorage.setItem(KEY_PIN, JSON.stringify(p));
-  document.getElementById('pin-old').value='';
-  document.getElementById('pin-new').value='';
-  document.getElementById('st-pin').textContent='✔ PIN-i u ndryshua!';
+// ═══════════════════════════════════════════
+//  INICIM APP
+// ═══════════════════════════════════════════
+function inicioApp(){
+  var sot=new Date();
+  document.getElementById('inp-datum').value=
+    sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+  document.getElementById('filt-muaj').value=
+    sot.getFullYear()+'-'+pad(sot.getMonth()+1);
+  gObjektet=[];
+  perditesoObjekteLista();
+  shfaqTeGjitha();
+  perditesoMuajTitull();
+  ngarkoPlanin();
+  hapTab('zeit');
 }
 
-function dale(){
-  gPunetor=null;
-  gHyrjet=[];
-  document.getElementById('ekrani-hyrje').classList.remove('hide');
-  document.getElementById('faqja-kryesore').classList.add('hide');
-  document.getElementById('login-pin').value='';
+// ═══════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════
+function hapTab(t){
+  ['zeit','plan','set'].forEach(function(x){
+    document.getElementById('faqe-'+x).classList.remove('aktiv');
+    document.getElementById('tab-'+x).classList.remove('aktiv');
+    document.getElementById('nb-'+x).classList.remove('aktiv','plan');
+  });
+  document.getElementById('faqe-'+t).classList.add('aktiv');
+  document.getElementById('tab-'+t).classList.add('aktiv');
+  document.getElementById('nb-'+t).classList.add('aktiv');
+  if(t==='plan'){ document.getElementById('nb-'+t).classList.add('plan'); ngarkoPlanin(); }
 }
 
-function ruajAutomatik(){
-  if(!gHyrjet.length) return;
-  try{
-    var d=[];
-    for(var i=0;i<gHyrjet.length;i++){
-      var h=gHyrjet[i];
-      if(h.abwesend){
-        d.push({id:h.id,datum:h.datum,mitarbeiter:h.mitarbeiter,
-          abwesend:true,von:'\u2014',bis:'\u2014',pause:'0',
-          ore:h.ore,lnr:'',bezeichnung:h.bezeichnung,
-          taetigkeit:'ABWESENHEIT',notiz:h.notiz,abgrund:h.abgrund});
-      } else {
-        var m=h.bis?h.minuta:minutaTe(h.von_iso);
-        d.push({id:h.id,datum:h.datum,mitarbeiter:h.mitarbeiter,
-          abwesend:false,von:h.von,bis:h.bis||'',pause:'0',
-          ore:Math.round(m/60*100)/100,lnr:String(h.nr),
-          bezeichnung:h.emri,taetigkeit:'Hausmeister',notiz:'',abgrund:''});
-      }
-    }
-    localStorage.setItem('fth_auto_dump', JSON.stringify(d));
-    document.getElementById('st-auto').textContent=
-      '\u2714 T\u00eb dh\u00ebnat u ruajt\u00ebn automatikisht ('+d.length+' hyrje)';
-  }catch(e){}
+// ═══════════════════════════════════════════
+//  MODE PUNË / MUNGESË
+// ═══════════════════════════════════════════
+function setMode(m){
+  gMode=m;
+  document.getElementById('mb-arbeit').className='mode-btn'+(m==='arbeit'?' sel-arbeit':'');
+  document.getElementById('mb-abwes').className='mode-btn'+(m==='abwes'?' sel-abwes':'');
+  document.getElementById('sek-arbeit').className=m==='arbeit'?'':'hide';
+  document.getElementById('sek-abwes').className=m==='abwes'?'':'hide';
 }
 
-function lexoLinkun(){
-  var m=window.location.search.match(/[?&]objekt=(\d+)/);
-  if(!m) m=window.location.hash.match(/objekt=(\d+)/);
-  if(!m) return false;
-  var nr=parseInt(m[1]);
-  var o=gjejObjektin(nr);
-  if(!o) return false;
-  // mos e nise dy here te njejtin
-  for(var i=0;i<gHyrjet.length;i++){
-    if(gHyrjet[i].nr===nr && !gHyrjet[i].bis) return true;
-  }
-  filloObjektin(nr);
-  document.getElementById('st-skan').textContent='✔ U hap nga QR: '+nr+' · '+o.name;
-  return true;
-}
-function mbushListen(){
-  var sel=document.getElementById('zgjedh-obj');
-  var html='<option value="">— Prek objektin —</option>';
-  var sot=dataISO(), perdorur={};
-  for(var i=0;i<gHyrjet.length;i++){ if(gHyrjet[i].data===sot) perdorur[gHyrjet[i].nr]=true; }
-  for(var j=0;j<OBJEKTET.length;j++){
-    var o=OBJEKTET[j];
-    var shenja = perdorur[o.nr] ? '  ✔' : '';
-    html+='<option value="'+o.nr+'">'+o.nr+' · '+o.name+shenja+'</option>';
+// ═══════════════════════════════════════════
+//  OBJEKTE MULTIPLE BRENDA DITËS
+// ═══════════════════════════════════════════
+function mbushListenObjekteve(){
+  var sel=document.getElementById('obj-lista');
+  if(!sel) return;
+  var p=[];
+  try{p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');}catch(e){p=[];}
+  p.sort(function(a,b){return (a.nr||0)-(b.nr||0);});
+  var html='<option value="">— Zgjidh objektin —</option>';
+  for(var i=0;i<p.length;i++){
+    var o=p[i];
+    html+='<option value="'+o.nr+'">'+o.nr+' · '+(o.name||'')+'</option>';
   }
   sel.innerHTML=html;
 }
-function zgjidhObjektin(v){
+function zgjidhNgaLista(v){
   if(!v) return;
-  filloObjektin(v);
-  document.getElementById('zgjedh-obj').value='';
+  document.getElementById('obj-nr').value=v;
+  kerkoObj(v);
 }
 
-function ruajMungesen(){
-  var arsye=document.getElementById('ab-arsye').value;
-  var dite=document.getElementById('ab-dite').value;
-  var notiz=document.getElementById('ab-notiz').value.trim();
-  var oreSipas={'1 ditë e plotë':8,'0.5 gjysmë dite':4,'2 ditë':16,'3 ditë':24,'1 javë':40};
-  var oreAbwes=oreSipas.hasOwnProperty(dite)?oreSipas[dite]:8;
-  var tani=new Date();
+// ═══════════════════════════════════════════
+//  SKANIMI QR I OBJEKTIT
+// ═══════════════════════════════════════════
+var gQRStream=null, gQRDetektor=null, gQRDuke=false;
 
-  // Mbyll objektin e hapur
-  for(var j=0;j<gHyrjet.length;j++){
-    if(!gHyrjet[j].bis && !gHyrjet[j].abwesend){
-      gHyrjet[j].bis=oraTani().slice(0,5);
-      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
-    }
+function hapQR(){
+  var wrap=document.getElementById('qr-wrap');
+  var v=document.getElementById('qr-video');
+  var st=document.getElementById('st-qr');
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    st.textContent='⚠ Kamera nuk mbeshtetet. Shkruaj numrin.'; return;
   }
-
-  gHyrjet.push({
-    id: tani.getTime().toString()+Math.random().toString(36).substr(2,4),
-    data: dataISO(), datum: dataSot(),
-    mitarbeiter: document.getElementById('punetori').value,
-    abwesend: true,
-    von: '—', bis: '—', pause: '0', ore: oreAbwes,
-    nr: '', emri: '', klient: '',
-    lnr: '', bezeichnung: dite,
-    taetigkeit: 'ABWESENHEIT',
-    notiz: notiz || arsye,
-    abgrund: arsye,
-    punetori: document.getElementById('punetori').value,
-    von_iso: null, minuta: 0
-  });
-
-  ruajHyrjet(); vizato(); mbushListen();
-  var kujtesa = arsye.indexOf('Krank')>=0 ? ' · ⚠ Dërgo Krankenschein me E-Mail!' : '';
-  document.getElementById('st-abwes').textContent='✔ U regjistrua: '+arsye+' · '+dite+' ('+oreAbwes+'h)'+kujtesa;
-  document.getElementById('ab-notiz').value='';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+  .then(function(s){
+    gQRStream=s; v.srcObject=s; v.play(); gQRDuke=true;
+    wrap.classList.remove('hide');
+    st.textContent='Drejtoji kamerën kodit QR...';
+    skanoQR();
+  })
+  .catch(function(e){ st.textContent='⚠ Kamera nuk hapet: '+e.message; });
 }
 
-function eksportoJSONlaptop(){
-  if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
-  var d=[];
-  for(var i=0;i<gHyrjet.length;i++){
-    var h=gHyrjet[i];
-    if(h.abwesend){
-      d.push({
-        id: h.id, datum: h.datum, mitarbeiter: h.mitarbeiter,
-        abwesend: true, von: '—', bis: '—', pause: '0',
-        ore: h.ore, lnr: '', bezeichnung: h.bezeichnung,
-        taetigkeit: 'ABWESENHEIT', notiz: h.notiz, abgrund: h.abgrund
-      });
+function ndalQR(){
+  if(gQRStream){ gQRStream.getTracks().forEach(function(x){x.stop();}); gQRStream=null; }
+  gQRDuke=false;
+  document.getElementById('qr-wrap').classList.add('hide');
+}
+
+function skanoQR(){
+  if(!gQRDuke) return;
+  var v=document.getElementById('qr-video');
+  var st=document.getElementById('st-qr');
+  if(!('BarcodeDetector' in window)){
+    st.textContent='⚠ Ky telefon s\'e lexon QR vetë. Shkruaj numrin.'; return;
+  }
+  if(!gQRDetektor){ gQRDetektor=new BarcodeDetector({formats:['qr_code']}); }
+  gQRDetektor.detect(v).then(function(list){
+    if(list && list.length){
+      var teksti=list[0].rawValue;
+      var m=String(teksti).match(/(\d{3,5})/);
+      ndalQR();
+      if(m){ document.getElementById('obj-nr').value=m[1]; kerkoObj(m[1]);
+             st.textContent='✔ U lexua: '+m[1]; }
+      else { st.textContent='⚠ Kodi nuk u lexua'; }
+      return;
+    }
+    setTimeout(skanoQR,400);
+  }).catch(function(){ setTimeout(skanoQR,600); });
+}
+
+function shtoObjekt(){
+  document.getElementById('shto-obj-form').classList.remove('hide');
+  mbushListenObjekteve();
+  document.getElementById('obj-nr').value='';
+  document.getElementById('obj-bez').value='';
+  document.getElementById('obj-notiz').value='';
+  document.getElementById('obj-info').textContent='';
+}
+function anulloObjekt(){
+  if(typeof ndalQR==='function') ndalQR();
+  document.getElementById('shto-obj-form').classList.add('hide');
+}
+function kerkoObj(nr){
+  var info=document.getElementById('obj-info');
+  var ni=parseInt(nr);
+  if(!nr||isNaN(ni)){info.textContent='';return;}
+  var taet=ni>=1001&&ni<=2000?'Hausmeister':'';
+  try{
+    var p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');
+    var g=p.find(function(x){return x.nr==ni;});
+    if(g){
+      document.getElementById('obj-bez').value=g.name;
+      if(g.taetigkeit) taet=g.taetigkeit;
+      info.style.color='#27AE60'; info.textContent='✔ '+g.name;
     } else {
-      var m = h.bis ? h.minuta : minutaTe(h.von_iso);
-      d.push({
-        id: h.id, datum: h.datum, mitarbeiter: h.mitarbeiter,
-        abwesend: false, von: h.von, bis: h.bis||'',
-        pause: '0', ore: Math.round(m/60*100)/100,
-        lnr: String(h.nr), bezeichnung: h.emri,
-        taetigkeit: 'Hausmeister', notiz: '', abgrund: ''
-      });
+      info.style.color='#E67E22';
+      info.textContent=taet?'Tätigkeit: '+taet:'⚠ Nr. nuk ekziston';
     }
-  }
-  var teksti=JSON.stringify(d, null, 1);
-  var el=document.getElementById('eksport');
-  el.value=teksti; el.classList.remove('hide');
-  document.getElementById('st-lista').textContent='JSON gati - kopjoje ose shkarkoje';
-  try{ el.select(); document.execCommand('copy'); document.getElementById('st-lista').textContent='✔ JSON u kopjua!'; }catch(e){}
-  try{
-    var blob=new Blob([teksti],{type:'application/json;charset=utf-8'});
-    var a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='Zeiterfassung_'+dataISO()+'.json';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }catch(e){}
+  if(taet) document.getElementById('obj-taet').value=taet;
 }
-
-function shfaqTeGjithe(){
-  gTeGjithe=true;
-  merrHyrjet(); vizato();
+function konfirmoObjekt(){
+  var nr=document.getElementById('obj-nr').value;
+  var bez=document.getElementById('obj-bez').value.trim();
+  var taet=document.getElementById('obj-taet').value;
+  var notiz=document.getElementById('obj-notiz').value.trim();
+  if(!bez&&!nr){alert('Fut të paktën Projekt Nr. ose Emrin!');return;}
+  gObjektet.push({nr:nr,bez:bez,taet:taet,notiz:notiz});
+  perditesoObjekteLista();
+  document.getElementById('shto-obj-form').classList.add('hide');
 }
-
-function shfaqVetemMua(){
-  gTeGjithe=false;
-  merrHyrjet(); vizato();
+function hiqObjektin(i){
+  gObjektet.splice(i,1);
+  perditesoObjekteLista();
 }
-
-function vizato(){
-  var el=document.getElementById('lista');
-  if(!gHyrjet.length){
-    el.innerHTML='<div class="help">Ende pa objekte sot</div>';
-    document.getElementById('st-lista').textContent='';
+function perditesoObjekteLista(){
+  var el=document.getElementById('objekte-lista');
+  if(!gObjektet.length){
+    el.innerHTML='<div style="font-size:.76rem;color:var(--gray);padding:6px 0">Ende nuk ke shtuar objekte sot</div>';
     return;
   }
-  var html='', gjith=0;
-  for(var i=0;i<gHyrjet.length;i++){
-    var h=gHyrjet[i];
-    var m = h.abwesend ? 0 : (h.bis ? h.minuta : minutaTe(h.von));
-    gjith+=m;
-    if(h.abwesend){
-      html+='<div class="obj" style="border-color:#E74C3C">'+
-        '<span class="obj-nr">🏠</span>'+
-        '<span class="obj-em">'+h.abgrund+' · '+h.bezeichnung+' · '+(h.punetori||h.mitarbeiter||'').split(' ')[0]+'</span>'+
-        '<span class="obj-or">'+h.ore+'h</span></div>';
-      continue;
-    }
-    html+='<div class="obj'+(h.bis?'':' aktiv')+'">'+
-      '<span class="obj-nr">'+h.nr+'</span>'+
-      '<span class="obj-em">'+(h.punetori? h.punetori.split(' ')[0]+' · ':'')+h.emri+(h.bis?'':' · në punë')+'</span>'+
-      '<span class="obj-or">'+h.von+(h.bis?' - '+h.bis:' ...')+'</span></div>';
-  }
-  el.innerHTML=html;
-  document.getElementById('st-lista').textContent=
-    'Gjithsej: '+Math.floor(gjith/60)+'h '+dy(gjith%60)+'m ('+gHyrjet.length+' objekte)';
+  el.innerHTML=gObjektet.map(function(o,i){
+    return '<div class="objekt-item">' +
+      '<div class="objekt-info">' +
+      '<div>'+(o.nr?'['+o.nr+'] ':'')+o.bez+'</div>' +
+      '<div style="color:var(--gray);font-size:.72rem">'+o.taet+(o.notiz?' · '+o.notiz:'')+'</div>' +
+      '</div>' +
+      '<button class="btn-rm-obj" onclick="hiqObjektin('+i+')">✕</button>' +
+      '</div>';
+  }).join('');
 }
-function filloObjektin(teksti){
-  var nr=null;
-  var m=String(teksti).match(/(\d{3,5})/);
-  if(m) nr=parseInt(m[1]);
-  if(!nr){ document.getElementById('st-skan').textContent='⚠ Kodi nuk u lexua'; return; }
-  var o=gjejObjektin(nr);
-  if(!o){ document.getElementById('st-skan').textContent='⚠ Objekti '+nr+' nuk ekziston'; return; }
-  // a eshte hapur me pare?
-  for(var i=0;i<gHyrjet.length;i++){
-    if(gHyrjet[i].nr===nr && gHyrjet[i].bis){
-      document.getElementById('st-skan').textContent='⚠ Objekti '+nr+' u mbyll me pare';
-      return;
-    }
-    if(gHyrjet[i].nr===nr && !gHyrjet[i].bis){
-      document.getElementById('st-skan').textContent='ℹ Objekti '+nr+' eshte duke u numeruar';
-      return;
-    }
+
+// ═══════════════════════════════════════════
+//  RUAJ HYRJEN
+// ═══════════════════════════════════════════
+function ruajHyrjen(){
+  if(!gPunetor){shfaqSt('st-ruaj','⚠ Nuk je i kyçur!','gabim');return;}
+  var datumRaw=document.getElementById('inp-datum').value;
+  if(!datumRaw){shfaqSt('st-ruaj','⚠ Zgjidh datën!','gabim');return;}
+  var p=datumRaw.split('-');
+  var datum=p[2]+'.'+p[1]+'.'+p[0];
+
+  if(gMode==='abwes'){
+    var diteVal=document.getElementById('inp-ab-dite').value;
+    var oreSipasDites={'1 ditë e plotë':8,'0.5 gjysmë dite':4,'2 ditë':16,'3 ditë':24,'1 javë':40};
+    var oreAbwes=oreSipasDites.hasOwnProperty(diteVal)?oreSipasDites[diteVal]:8;
+    var h={
+      id:Date.now().toString()+Math.random().toString(36).substr(2,4),
+      datum:datum,mitarbeiter:gPunetor,abwesend:true,
+      von:'—',bis:'—',pause:'0',ore:oreAbwes,lnr:'',
+      bezeichnung:diteVal,
+      taetigkeit:'ABWESENHEIT',
+      notiz:document.getElementById('inp-abgrund').value,
+      abgrund:document.getElementById('inp-abgrund').value
+    };
+    var data=merrH(); data.push(h); data.sort(srtK); ruajH(data);
+    shfaqTeGjitha();
+    var kujtesa=(document.getElementById('inp-abgrund').value.indexOf('Krank')>=0)?' ⚠️ Dërgo Krankenschein te firma me E-Mail!':'';
+    shfaqSt('st-ruaj','✔ Mungesa u regjistrua! ('+oreAbwes.toFixed(2)+'h)'+kujtesa,'suksess');
+    setTimeout(function(){document.getElementById('st-ruaj').style.display='none';},kujtesa?6000:3000);
+    return;
   }
-  // mbyll objektin e hapur
-  for(var j=0;j<gHyrjet.length;j++){
-    if(!gHyrjet[j].bis){
-      gHyrjet[j].bis=oraTani().slice(0,5);
-      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
-    }
-  }
-  var tani=new Date();
-  gHyrjet.push({
-    data:dataISO(), datum:dataSot(), nr:o.nr, emri:o.name, klient:o.klient,
-    von:oraTani().slice(0,5), von_iso:tani.toISOString(), bis:null, minuta:0,
-    punetori:document.getElementById('punetori').value
+
+  var von=document.getElementById('inp-von').value;
+  var bis=document.getElementById('inp-bis').value;
+  var pause=parseInt(document.getElementById('inp-pause').value)||0;
+  if(!von||!bis){shfaqSt('st-ruaj','⚠ Fut orën e fillimit dhe fundit!','gabim');return;}
+  var ore=llogaritOre(von,bis,pause);
+  if(ore===null){shfaqSt('st-ruaj','⚠ Orët janë të gabuara!','gabim');return;}
+
+  // Nëse nuk ka objekte, krijo nga fushat e sipërme
+  var objList=gObjektet.length>0?gObjektet:[{
+    nr:'',bez:'',taet:'Sonstiges',notiz:''
+  }];
+
+  var h={
+    id:Date.now().toString()+Math.random().toString(36).substr(2,4),
+    datum:datum,mitarbeiter:gPunetor,abwesend:false,
+    von:von,bis:bis,pause:String(pause),ore:ore,
+    taetigkeit:objList[0].taet||'Sonstiges',
+    lnr:objList[0].nr||'',
+    bezeichnung:objList[0].bez||'',
+    notiz:objList[0].notiz||'',
+    objekte:objList.length>1?objList:undefined
+  };
+
+  var data=merrH(); data.push(h); data.sort(srtK); ruajH(data);
+  shfaqTeGjitha();
+
+  // Reset
+  gObjektet=[];
+  perditesoObjekteLista();
+
+  shfaqSt('st-ruaj','✔ '+datum+' · '+ore.toFixed(2)+'h · '+(objList.length>1?objList.length+' objekte':''),'suksess');
+  setTimeout(function(){document.getElementById('st-ruaj').style.display='none';},3500);
+}
+
+function llogaritOre(von,bis,pause){
+  try{
+    var vp=von.split(':'),bp=bis.split(':');
+    var vM=parseInt(vp[0])*60+parseInt(vp[1]);
+    var bM=parseInt(bp[0])*60+parseInt(bp[1]);
+    var d=bM-vM-pause; if(d<0)d+=1440;
+    return Math.round(d*100/60)/100;
+  }catch(e){return null;}
+}
+
+function srtK(a,b){
+  function k(h){var d=(h.datum||'').split('.');return (d[2]||'')+(d[1]||'')+(d[0]||'');}
+  return k(a)>k(b)?1:-1;
+}
+
+// ═══════════════════════════════════════════
+//  LISTA HYRJEVE
+// ═══════════════════════════════════════════
+function shfaqTeGjitha(){
+  gFiltro=null;
+  // Shfaq vetëm hyrjet e punëtorit aktual
+  var data=merrH().filter(function(h){return h.mitarbeiter===gPunetor;});
+  shfaqListen(data);
+}
+
+function filtro(){
+  var mv=document.getElementById('filt-muaj').value;
+  if(!mv){shfaqTeGjitha();return;}
+  var p=mv.split('-');
+  var fs=p[1]+'.'+p[0];
+  var data=merrH().filter(function(h){
+    return h.mitarbeiter===gPunetor&&(h.datum||'').substring(3,10)===fs;
   });
-  ruajHyrjet(); vizato(); mbushListen();
-  document.getElementById('st-skan').textContent='✔ '+o.nr+' · '+o.name;
+  gFiltro=data;
+  shfaqListen(data);
 }
-function mbyllAktivin(){
-  for(var j=0;j<gHyrjet.length;j++){
-    if(!gHyrjet[j].bis){
-      gHyrjet[j].bis=oraTani().slice(0,5);
-      gHyrjet[j].minuta=minutaTe(gHyrjet[j].von_iso);
-    }
-  }
-  ruajHyrjet(); vizato(); mbushListen();
-}
-function mbylleDiten(){
-  mbyllAktivin();
-  document.getElementById('st-lista').textContent='✔ Dita u mbyll - '+gHyrjet.length+' objekte';
-}
-function filloMeNumer(){
-  var v=document.getElementById('nr-dore').value;
-  if(!v) return;
-  filloObjektin(v);
-  document.getElementById('nr-dore').value='';
-}
-function eksportoCSV(){
-  if(!gHyrjet.length){ document.getElementById('st-lista').textContent='Nuk ka te dhena'; return; }
-  var r=['Datum;Objekt_Nr;Emri_Objektit;Klienti;Von;Bis;Stunden;Minuten;Mitarbeiter'];
-  for(var i=0;i<gHyrjet.length;i++){
-    var h=gHyrjet[i];
-    var m=h.bis?h.minuta:minutaTe(h.von_iso);
-    var ka=h.klient.replace(/;/g,',');
-    r.push([h.datum,h.nr,h.emri,h.klient,h.von,h.bis||'',
-      String(Math.floor(m/60))+':'+dy(m%60),m,h.punetori].join(';'));
-  }
-  var teksti=r.join('\r\n');
-  var el=document.getElementById('eksport');
-  el.value=teksti;
-  el.classList.remove('hide');
-  document.getElementById('st-lista').textContent='Kopjo tekstin dhe ngjite ne Excel';
-  try{ el.select(); document.execCommand('copy'); document.getElementById('st-lista').textContent='✔ U kopjua! Ngjite ne Excel'; }catch(e){}
-  // provo shkarkimin (funksionon vetem ne disa telefona)
-  try{
-    var blob=new Blob(['\ufeff'+teksti],{type:'text/csv;charset=utf-8'});
-    var a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='FTH_Hausmeister_'+dataISO()+'.csv';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }catch(e){}
-}
-function fshiDiten(){
-  var b=document.getElementById('btn-fshi');
-  if(b.dataset.bere!=='1'){
-    b.dataset.bere='1';
-    b.textContent='⚠ Prek perseri per te fshire';
-    b.style.background='#8e2b20';
-    setTimeout(function(){ b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background=''; },4000);
-    return;
-  }
-  gHyrjet=[]; ruajHyrjet(); vizato(); mbushListen();
-  var el=document.getElementById('eksport'); el.value=''; el.classList.add('hide');
-  document.getElementById('st-lista').textContent='✔ U fshine te gjitha';
-  b.dataset.bere='0'; b.textContent='🗑 Fshi'; b.style.background='';
-}
-function tik(){
-  document.getElementById('ora-now').textContent=oraTani();
-  document.getElementById('dita').textContent='Dita: '+dataSot();
-  if(gHyrjet.length && !gHyrjet[gHyrjet.length-1].bis) vizato();
-}
-ngarkoPunetoret();
-mbushLogin();
 
-mbushListen();
-vizato();
-lexoLinkun();
-ruajAutomatik();
-setInterval(ruajAutomatik, 60000);
-setInterval(tik,1000); tik();
-</div>
+function shfaqListen(data){
+  var el=document.getElementById('lista-h');
+  var totSek=document.getElementById('tot-sek');
+  if(!data||!data.length){
+    el.innerHTML='<div class="bosh"><div class="bosh-ico">📋</div><div>Nuk ka hyrje</div></div>';
+    totSek.style.display='none'; return;
+  }
+  var tOre=0,dPune=0,mung=0;
+  data.forEach(function(h){
+    if(h.abwesend||h.taetigkeit==='ABWESENHEIT')mung++;
+    else{tOre+=parseFloat(h.ore||0);dPune++;}
+  });
+  document.getElementById('tot-dite').textContent=dPune;
+  document.getElementById('tot-ore').textContent=tOre.toFixed(1)+'h';
+  document.getElementById('tot-mes').textContent=dPune>0?(tOre/dPune).toFixed(1)+'h':'0h';
+  totSek.style.display='block';
+
+  el.innerHTML=data.slice().reverse().map(function(h){
+    var abw=h.abwesend||h.taetigkeit==='ABWESENHEIT';
+    if(abw){
+      return '<div class="hyrja-item abwes">' +
+        '<div class="hyrja-info">' +
+        '<div class="hyrja-data">'+h.datum+'</div>' +
+        '<div class="hyrja-ore" style="color:var(--red)">🏠 Mungesë</div>' +
+        '<div class="hyrja-proj">'+h.notiz+(h.bezeichnung?' · '+h.bezeichnung:'')+'</div>' +
+        '</div><button class="btn-fshi-s" onclick="fshiH(\''+h.id+'\')">✕</button></div>';
+    }
+    var ore=parseFloat(h.ore||0);
+    var ngjyra=ore>8?'color:var(--red)':'';
+    var multiTxt='';
+    if(h.objekte&&h.objekte.length>1){
+      multiTxt='<div class="hyrja-multi">'+h.objekte.map(function(o){
+        return (o.nr?'['+o.nr+'] ':'')+o.bez;
+      }).join(' · ')+'</div>';
+    }
+    return '<div class="hyrja-item">' +
+      '<div class="hyrja-info">' +
+      '<div class="hyrja-data">'+h.datum+' · '+h.von+'-'+h.bis+'</div>' +
+      '<div class="hyrja-ore" style="'+ngjyra+'">'+ore.toFixed(2)+'h</div>' +
+      '<div class="hyrja-proj">'+h.taetigkeit+(h.bezeichnung?' · '+h.bezeichnung:'')+'</div>' +
+      multiTxt+'</div>' +
+      '<button class="btn-fshi-s" onclick="fshiH(\''+h.id+'\')">✕</button></div>';
+  }).join('');
+}
+
+function fshiH(id){
+  if(!confirm('Fshi këtë hyrje?'))return;
+  ruajH(merrH().filter(function(h){return h.id!==id;}));
+  gFiltro?filtro():shfaqTeGjitha();
+}
+
+// ═══════════════════════════════════════════
+//  EKSPORT / IMPORT
+// ═══════════════════════════════════════════
+function eksportoJSON(){
+  var data=merrH().filter(function(h){return h.mitarbeiter===gPunetor;});
+  if(!data.length){alert('Nuk ka hyrje!');return;}
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Zeiterfassung_'+gPunetor.replace(/ /g,'_')+'.json';
+  a.click();
+}
+function toggleImport(){
+  var s=document.getElementById('import-sek');
+  s.className=s.className==='hide'?'':'hide';
+}
+function importoJSON(){
+  var txt=document.getElementById('import-ta').value.trim();
+  if(!txt){shfaqSt('st-import','⚠ Ngjit JSON!','gabim');return;}
+  try{
+    var te_reja=JSON.parse(txt);
+    if(!Array.isArray(te_reja))throw new Error('Format gabim');
+    var eks=merrH(); var ids={};
+    eks.forEach(function(h){ids[h.id]=true;});
+    var n=0;
+    te_reja.forEach(function(h){if(!ids[h.id]){eks.push(h);n++;}});
+    eks.sort(srtK); ruajH(eks);
+    shfaqTeGjitha();
+    document.getElementById('import-ta').value='';
+    shfaqSt('st-import','✔ '+n+' hyrje të reja!','suksess');
+  }catch(e){shfaqSt('st-import','⚠ '+e.message,'gabim');}
+}
+function importoProjektet(){
+  var txt=document.getElementById('import-proj').value.trim();
+  if(!txt){shfaqSt('st-import','⚠ Ngjit projektet!','gabim');return;}
+  try{
+    var p=JSON.parse(txt);
+    localStorage.setItem(KEY_PR,JSON.stringify(p));
+  mbushListenObjekteve();
+    document.getElementById('import-proj').value='';
+    shfaqSt('st-import','✔ '+p.length+' projekte!','suksess');
+  }catch(e){shfaqSt('st-import','⚠ '+e.message,'gabim');}
+}
+
+// ═══════════════════════════════════════════
+//  PLANI MUJOR
+// ═══════════════════════════════════════════
+var MUAJET=['Janar','Shkurt','Mars','Prill','Maj','Qershor',
+            'Korrik','Gusht','Shtator','Tetor','Nentor','Dhjetor'];
+var DITET=['Die','Hen','Mar','Mer','Enj','Pre','Sht'];
+
+function perditesoMuajTitull(){
+  document.getElementById('plan-titull').textContent=MUAJET[gPlanMuaji-1]+' '+gPlanViti;
+}
+function ndryshojMuajin(d){
+  gPlanMuaji+=d;
+  if(gPlanMuaji>12){gPlanMuaji=1;gPlanViti++;}
+  if(gPlanMuaji<1){gPlanMuaji=12;gPlanViti--;}
+  perditesoMuajTitull(); ngarkoPlanin();
+}
+function ngarkoPlanin(){
+  var lista=document.getElementById('plan-lista');
+  var stats=document.getElementById('plan-stats');
+  if(!gPunetor){
+    lista.innerHTML='<div class="bosh"><div class="bosh-ico">🔐</div><div>Kyçu për të parë planin</div></div>';
+    stats.classList.add('hide'); return;
+  }
+  var planData={};
+  try{var r=localStorage.getItem(KEY_PL);if(r)planData=JSON.parse(r);}catch(e){}
+  var emriPlan=planData[gPunetor]||{};
+
+  var ditNeMuaj=new Date(gPlanViti,gPlanMuaji,0).getDate();
+  var sot=new Date();
+  var sotStr=pad(sot.getDate())+'.'+pad(sot.getMonth()+1)+'.'+sot.getFullYear();
+
+  var np=0,nl=0,dp=0,html='';
+  for(var d=1;d<=ditNeMuaj;d++){
+    var df=pad(d)+'.'+pad(gPlanMuaji)+'.'+gPlanViti;
+    var dt=new Date(gPlanViti,gPlanMuaji-1,d);
+    var dn=DITET[dt.getDay()];
+    var isSot=df===sotStr;
+    var isFund=dt.getDay()===0||dt.getDay()===6;
+    var proj=emriPlan[df]||'';
+    var shen=emriPlan[df+'_shen']||'';
+    if(!isFund){dp++;if(proj)np++;else nl++;}
+    var cls=isSot?'sot':(proj?'busy':(isFund?'wknd':''));
+    var badge=isSot?'<span class="badge-sot">SOT</span>':'';
+    var det=proj
+      ?('<div class="proj-em">'+proj+badge+'</div>'+(shen?'<div class="proj-sh">⏰ '+shen+'</div>':''))
+      :(isFund?'<div class="lire">Fundjave'+badge+'</div>':'<div class="lire">I lire'+badge+'</div>');
+    html+='<div class="dite-item '+cls+'"><div class="d-nr-kol"><div class="d-nr">'+pad(d)+'</div><div class="d-em">'+dn+'</div></div><div class="d-det">'+det+'</div></div>';
+  }
+  document.getElementById('ps-p').textContent=np;
+  document.getElementById('ps-l').textContent=nl;
+  document.getElementById('ps-t').textContent=dp;
+  stats.classList.remove('hide');
+  lista.innerHTML=html;
+  setTimeout(function(){
+    var s=lista.querySelector('.sot');
+    if(s)s.scrollIntoView({behavior:'smooth',block:'center'});
+  },150);
+}
+function importoPlanin(){
+  var txt=document.getElementById('import-plan-ta').value.trim();
+  if(!txt){shfaqSt('st-plan','⚠ Ngjit planin!','gabim');return;}
+  try{
+    var d=JSON.parse(txt);
+    var planData={};
+    try{var r=localStorage.getItem(KEY_PL);if(r)planData=JSON.parse(r);}catch(e){}
+    // Mbështet dy formata: {puntoret:{em:{ditet:[]}}} ose direkt {em:{data:proj}}
+    var burimi=d.puntoret||d;
+    Object.keys(burimi).forEach(function(em){
+      if(!planData[em])planData[em]={};
+      var ePlan=burimi[em];
+      if(ePlan.ditet){
+        ePlan.ditet.forEach(function(dt){
+          if(dt.projekt)planData[em][dt.data]=dt.projekt;
+          else delete planData[em][dt.data];
+          if(dt.shen)planData[em][dt.data+'_shen']=dt.shen;
+          else delete planData[em][dt.data+'_shen'];
+        });
+      } else {
+        Object.assign(planData[em],ePlan);
+      }
+    });
+    localStorage.setItem(KEY_PL,JSON.stringify(planData));
+    document.getElementById('import-plan-ta').value='';
+    ngarkoPlanin();
+    shfaqSt('st-plan','✔ Plani u ngarkua!','suksess');
+  }catch(e){shfaqSt('st-plan','⚠ '+e.message,'gabim');}
+}
+
+// ═══════════════════════════════════════════
+//  CILËSIMET
+// ═══════════════════════════════════════════
+function ndryshoPin(){
+  var old=document.getElementById('pin-old').value;
+  var n1=document.getElementById('pin-new1').value;
+  var n2=document.getElementById('pin-new2').value;
+  if(old!==merrPin(gPunetor)){shfaqSt('st-pin','⚠ PIN aktual është i gabuar!','gabim');return;}
+  if(n1.length!==4||!/^\d{4}$/.test(n1)){shfaqSt('st-pin','⚠ PIN i ri duhet 4 shifra!','gabim');return;}
+  if(n1!==n2){shfaqSt('st-pin','⚠ PIN-et nuk përputhen!','gabim');return;}
+  var pinat={};
+  try{pinat=JSON.parse(localStorage.getItem(KEY_PIN)||'{}');}catch(e){}
+  pinat[gPunetor]=n1;
+  localStorage.setItem(KEY_PIN,JSON.stringify(pinat));
+  document.getElementById('pin-old').value='';
+  document.getElementById('pin-new1').value='';
+  document.getElementById('pin-new2').value='';
+  shfaqSt('st-pin','✔ PIN-i u ndryshua me sukses!','suksess');
+}
+
+function importoPunetoret(){
+  var txt=document.getElementById('import-pt-ta').value.trim();
+  if(!txt){shfaqSt('st-pt','⚠ Ngjit listën!','gabim');return;}
+  try{
+    var lista=JSON.parse(txt);
+    localStorage.setItem(KEY_PT,JSON.stringify(lista));
+    document.getElementById('import-pt-ta').value='';
+    shfaqSt('st-pt','✔ '+lista.length+' punëtorë!','suksess');
+  }catch(e){shfaqSt('st-pt','⚠ '+e.message,'gabim');}
+}
+
+function fshiTeGjitha(){
+  if(!confirm('KUJDES! Fshi të gjitha hyrjet e mia?')) return;
+  var data=merrH().filter(function(h){return h.mitarbeiter!==gPunetor;});
+  ruajH(data);
+  shfaqTeGjitha();
+  alert('✔ Hyrjet u fshinë!');
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function merrPunetoret(){
+  try{var d=localStorage.getItem(KEY_PT);if(d){var p=JSON.parse(d);if(p&&p.length)return p;}}catch(e){}
+  return Object.keys(PINAT_DEFAULT);
+}
+function migroOreMungese(d){
+  var oreSipasDites={'1 ditë e plotë':8,'0.5 gjysmë dite':4,'2 ditë':16,'3 ditë':24,'1 javë':40};
+  var ndryshuar=false;
+  d.forEach(function(h){
+    var abw=h.abwesend||h.taetigkeit==='ABWESENHEIT';
+    if(abw && (!h.ore||h.ore===0)){
+      h.ore=oreSipasDites.hasOwnProperty(h.bezeichnung)?oreSipasDites[h.bezeichnung]:8;
+      ndryshuar=true;
+    }
+  });
+  return ndryshuar;
+}
+function merrH(){
+  try{
+    var d=JSON.parse(localStorage.getItem(KEY_H)||'[]');
+    if(migroOreMungese(d)) ruajH(d);
+    return d;
+  }catch(e){return[];}
+}
+function ruajH(d){localStorage.setItem(KEY_H,JSON.stringify(d));}
+function shfaqSt(id,msg,tip){var e=document.getElementById(id);e.textContent=msg;e.className='status '+tip;}
 </script>
 </body>
 </html>
