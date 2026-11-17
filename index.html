@@ -293,6 +293,17 @@ textarea{width:100%;height:75px;background:#0d0d1a;color:var(--white);
       <div class="objekte-lista" id="objekte-lista"></div>
       <button class="btn-shto-obj" onclick="shtoObjekt()">➕ Shto Objekt / Projekt</button>
 
+      <!-- MBYLLJA E OBJEKTIT DHE E DITES -->
+      <div id="kohe-objekti" style="margin-top:10px;background:#0d0d1a;border-radius:10px;padding:11px;border:1px solid #2a2a50">
+        <div style="font-size:.78rem;color:var(--gray);margin-bottom:6px">⏱ Koha e punës në objektet</div>
+        <div id="lista-kohe" style="font-size:.82rem"></div>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn-red" onclick="mbyllObjektin()" style="margin-top:0;background:#E74C3C">⏹ Mbyll objektin</button>
+          <button class="btn btn-gray" onclick="mbyllDiten()" style="margin-top:0">⏹ Mbyll ditën</button>
+        </div>
+        <div class="status" id="st-kohe"></div>
+      </div>
+
       <!-- Modal shto objekt -->
       <div id="shto-obj-form" class="hide" style="background:#0d0d1a;border-radius:10px;padding:12px;margin-top:8px;border:1px solid #2a2a50">
         <label>Objekt (zgjidh nga lista)</label>
@@ -665,6 +676,7 @@ function nisObjektinNgaLinku(){
     gObjektet.push({nr:String(ni), bez:(o?o.name:''), taet:'Hausmeister', notiz:'nga QR'});
     ruajObjektetEDites();
     perditesoObjekteLista();
+    hapObjektin(ni, (o?o.name:''));
   }
   var info=document.getElementById('obj-info');
   if(info) info.textContent = o ? '\u2714 Nga QR: ' + o.name + ' (' + gObjektet.length + ' objekte sot)' : '\u26a0 Objekti ' + ni;
@@ -700,6 +712,7 @@ function inicioApp(){
   perditesoMuajTitull();
   ngarkoPlanin();
   hapTab('zeit');
+  perditesoKohet();
 }
 
 // ═══════════════════════════════════════════
@@ -992,6 +1005,7 @@ function konfirmoObjekt(){
   if(!bez&&!nr){alert('Fut të paktën Projekt Nr. ose Emrin!');return;}
   gObjektet.push({nr:nr,bez:bez,taet:taet,notiz:notiz});
   ruajObjektetEDites();
+  hapObjektin(nr, bez);
   perditesoObjekteLista();
   document.getElementById('shto-obj-form').classList.add('hide');
 }
@@ -1080,6 +1094,106 @@ function importoPlanin(){
   }catch(e){
     document.getElementById('st-plan').textContent='⚠ JSON i gabuar';
   }
+}
+
+
+// ═══════════════════════════════════════════
+//  KOHA E PUNES: hapje / mbyllje e objekteve
+// ═══════════════════════════════════════════
+var KEY_KOHE = 'fth_kohe_objekte';
+
+function oraTaniHHMM(){
+  var n=new Date();
+  return pad(n.getHours())+':'+pad(n.getMinutes());
+}
+
+function merrKohet(){
+  try{ return JSON.parse(localStorage.getItem(KEY_KOHE)||'[]'); }catch(e){ return []; }
+}
+function ruajKohet(a){ localStorage.setItem(KEY_KOHE, JSON.stringify(a)); }
+
+function hapObjektin(nr, emri){
+  var k=merrKohet();
+  var sot=new Date();
+  var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+  // mbyll objektin e hapur
+  for(var i=0;i<k.length;i++){
+    if(k[i].datum===tag && !k[i].bis){ k[i].bis=oraTaniHHMM(); }
+  }
+  // a eshte hapur me pare?
+  for(var j=0;j<k.length;j++){
+    if(k[j].datum===tag && String(k[j].nr)===String(nr)){
+      document.getElementById('st-kohe').textContent='ℹ Objekti '+nr+' u punua sot ('+k[j].von+' - '+k[j].bis+')';
+      ruajKohet(k); perditesoKohet(); return;
+    }
+  }
+  k.push({datum:tag, nr:String(nr), emri:emri||'', von:oraTaniHHMM(), bis:null, punetori:gPunetor||''});
+  ruajKohet(k);
+  perditesoKohet();
+}
+
+function mbyllObjektin(){
+  var k=merrKohet();
+  var sot=new Date();
+  var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+  var mbyllur=0;
+  for(var i=0;i<k.length;i++){
+    if(k[i].datum===tag && !k[i].bis){ k[i].bis=oraTaniHHMM(); mbyllur++; }
+  }
+  ruajKohet(k); perditesoKohet();
+  var st=document.getElementById('st-kohe');
+  st.textContent = mbyllur ? '✔ Objekti u mbyll ('+mbyllur+')' : 'Nuk ka objekt te hapur';
+}
+
+function mbyllDiten(){
+  mbyllObjektin();
+  var k=merrKohet();
+  var sot=new Date();
+  var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+  var min=0, nr=0;
+  for(var i=0;i<k.length;i++){
+    if(k[i].datum===tag && k[i].von && k[i].bis){
+      if(k[i].bis >= k[i].von){
+        var a=k[i].von.split(':'), b=k[i].bis.split(':');
+        min += (parseInt(b[0])*60+parseInt(b[1])) - (parseInt(a[0])*60+parseInt(a[1]));
+      }
+      nr++;
+    }
+  }
+  document.getElementById('st-kohe').textContent =
+    '✔ Dita u mbyll · '+nr+' objekte · '+(Math.floor(min/60))+'h '+pad(min%60)+'m';
+}
+
+function perditesoKohet(){
+  var el=document.getElementById('lista-kohe');
+  if(!el) return;
+  var k=merrKohet();
+  var sot=new Date();
+  var tag=sot.getFullYear()+'-'+pad(sot.getMonth()+1)+'-'+pad(sot.getDate());
+  var nder=[];
+  for(var i=0;i<k.length;i++){ if(k[i].datum===tag) nder.push(k[i]); }
+  if(!nder.length){
+    el.innerHTML='<span style="color:var(--gray)">Nuk ka objekte te hapura</span>';
+    return;
+  }
+  var min=0;
+  el.innerHTML = nder.map(function(o){
+    var m=0;
+    if(o.bis && o.bis>=o.von){
+      var a=o.von.split(':'), b=o.bis.split(':');
+      m=(parseInt(b[0])*60+parseInt(b[1]))-(parseInt(a[0])*60+parseInt(a[1]));
+      min+=m;
+    }
+    var boje = o.bis ? '#27AE60' : '#FFA500';
+    var teksti = o.bis ? (o.von+' - '+o.bis) : (o.von+' - ...');
+    var ora = o.bis ? Math.floor(m/60)+'h '+pad(m%60)+'m' : 'ne pune';
+    return '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #2a2a50">' +
+      '<span style="min-width:52px;font-weight:700;color:'+boje+'">'+o.nr+'</span>' +
+      '<span style="flex:1;font-size:.78rem">'+o.emri+'</span>' +
+      '<span style="color:'+boje+'">'+teksti+'</span>' +
+      '<span style="font-weight:700;color:var(--cyan)">'+ora+'</span></div>';
+  }).join('') +
+  '<div style="margin-top:6px;font-weight:700;color:var(--gold)">GJITHSEJ: '+Math.floor(min/60)+'h '+pad(min%60)+'m</div>';
 }
 
 function ruajHyrjen(){
