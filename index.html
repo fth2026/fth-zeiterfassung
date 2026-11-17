@@ -1,4 +1,4 @@
-Lista <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
@@ -580,6 +580,7 @@ function pinKonfirmo(){
     document.getElementById('nav-bot').style.display='flex';
     document.getElementById('hdr-user').textContent='👤 '+em;
     inicioApp();
+    nisObjektinNgaLinku();
   } else {
     document.getElementById('login-err').textContent='⚠ PIN i gabuar! Provo sërisht.';
     gPinBuffer=''; perditesoDotat();
@@ -608,6 +609,26 @@ function logout(){
 // ═══════════════════════════════════════════
 //  INICIM APP
 // ═══════════════════════════════════════════
+function objektNgaLinku(){
+  var m=location.search.match(/[?&](?:objekt|o)=([0-9]{3,5})/i);
+  return m ? parseInt(m[1]) : null;
+}
+
+function nisObjektinNgaLinku(){
+  var nr=objektNgaLinku();
+  if(!nr) return;
+  var ni=parseInt(nr);
+  var o=null;
+  try{ var p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');
+       if(!p||!p.length) p=OBJEKTET_BRENDA;
+       o=p.find(function(x){return x.nr==ni;}); }catch(e){}
+  var lista=document.getElementById('objekte-lista');
+  var info=document.getElementById('obj-info');
+  gObjektet=[{nr:String(ni), bez:(o?o.name:''), taet:'Hausmeister', notiz:''}];
+  perditesoObjekteLista();
+  if(info) info.textContent = o ? '\u2714 Nga QR: ' + o.name : '\u26a0 Objekti ' + ni;
+}
+
 function inicioApp(){
   var sot=new Date();
   document.getElementById('inp-datum').value=
@@ -1336,4 +1357,3 @@ function shfaqSt(id,msg,tip){var e=document.getElementById(id);e.textContent=msg
 </script>
 </body>
 </html>
-doli me 22 objekte ne hend.
