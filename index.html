@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Lista <!DOCTYPE html>
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
@@ -795,9 +795,20 @@ function hapQR(){
   var wrap=document.getElementById('qr-wrap');
   var v=document.getElementById('qr-video');
   var st=document.getElementById('st-qr');
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    st.textContent='⚠ Kamera nuk mbeshtetet. Shkruaj numrin.'; return;
+
+  // 1) Faqe jo-https? Kamera bllokohet nga shfletuesi.
+  if(location.protocol!=='https:' && location.hostname!=='localhost'){
+    st.innerHTML='⚠ Kamera nuk hapet jashtë internetit.<br>Shkruaj numrin, ose perdor listen e objekteve.';
+    return;
   }
+
+  // 2) Shfletuesi nuk e mbeshtet?
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    st.innerHTML='⚠ Ky shfletues nuk hap kamerën.<br>Shkruaj numrin, ose perdor listen e objekteve.';
+    return;
+  }
+
+  st.textContent='Po hapet kamera...';
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
   .then(function(s){
     gQRStream=s; v.srcObject=s; v.play(); gQRDuke=true;
@@ -805,7 +816,16 @@ function hapQR(){
     st.textContent='Drejtoji kamerën kodit QR...';
     skanoQR();
   })
-  .catch(function(e){ st.textContent='⚠ Kamera nuk hapet: '+e.message; });
+  .catch(function(e){
+    var em=(e && e.name) || '';
+    if(em==='NotAllowedError'){
+      st.innerHTML='⚠ Nuk dha leje për kamerën.<br>Kliko ikonën 🔒 lart te shiriti → Kamera → Lejo.';
+    } else if(em==='NotFoundError'){
+      st.innerHTML='⚠ Nuk u gjet kamera në telefon.<br>Shkruaj numrin, ose perdor listen.';
+    } else {
+      st.innerHTML='⚠ Kamera nuk hapet ('+em+').<br>Shkruaj numrin, ose perdor listen.';
+    }
+  });
 }
 
 function ndalQR(){
@@ -1316,3 +1336,4 @@ function shfaqSt(id,msg,tip){var e=document.getElementById(id);e.textContent=msg
 </script>
 </body>
 </html>
+doli me 22 objekte ne hend.
