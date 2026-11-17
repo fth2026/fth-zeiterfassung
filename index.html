@@ -338,7 +338,9 @@ textarea{width:100%;height:75px;background:#0d0d1a;color:var(--white);
       </select>
     </div>
 
-    <button class="btn btn-green" onclick="ruajHyrjen()">💾 Ruaj Hyrjen</button>
+    <button class="btn btn-gold" onclick="shfaqPlanin()" style="margin-top:8px">📅 Plani Im (ku jam me punu)</button>
+      <div id="plani-im" class="hide" style="margin-top:10px;background:#0d0d1a;border-radius:10px;padding:12px;border:1px solid #2a2a50"></div>
+      <button class="btn btn-green" onclick="ruajHyrjen()" style="margin-top:10px">💾 Ruaj Hyrjen</button>
     <div class="status" id="st-ruaj"></div>
   </div>
 
@@ -649,11 +651,127 @@ function setMode(m){
 // ═══════════════════════════════════════════
 //  OBJEKTE MULTIPLE BRENDA DITËS
 // ═══════════════════════════════════════════
+
+// OBJEKTET E HAUSMEISTER-IT (brenda faqes - nuk duhen importuar)
+var OBJEKTET_BRENDA = [
+ {
+  "nr": 1001,
+  "name": "Reinigung wie nach Plan · Kindertageseinrichtung Sonnenschein",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1002,
+  "name": "Röllfeld, Steigweg 1 · Gies Immobilien GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1003,
+  "name": "Wörth am Main, Galgenstr. 6 · Praxis Dr. Plattner Dr. Vogel Dr. Ide",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1004,
+  "name": "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a · PETERS GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1005,
+  "name": "Laudenbach, Mühlweg 51 · Gies Immobilien GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1006,
+  "name": "Obernburg, Obere Wallstr. 17-19 · AB-Hausverwaltung Wolf",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1007,
+  "name": "Klingenberg, Wilhelmstr. 63 · Markus Krall",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1008,
+  "name": "Wörth am Main, Beethovenstr. 2b · Vereinigte Schiffs-Versicherung V.A.G",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1009,
+  "name": "Wörth am Main, Frühlingsstr. 13a - 13b · Eva Schroll",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1010,
+  "name": "Wörth am Main, Moosgraben 25 · Immobilien Hausverwaltung Schultz GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1011,
+  "name": "Wörth am Main, Odenwaldstr. 30 · Ulrich Möller",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1012,
+  "name": "Haibach, Ludwigstr. 11 · Dieter Zang",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1013,
+  "name": "Wörth am Main, Presentstr. 19 · algeb awell GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1014,
+  "name": "Kleinheubach, Kastellstr. 11a · Main Immo Team GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1015,
+  "name": "Wörth am Main, Erlenstr. 9 · Ismail Sezer",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1016,
+  "name": "Kleinheubach, Jahnstr. 17 · WEG Jahnstr. 17 c/o Perfect Living",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1017,
+  "name": "Wörth am Main, Presentstr. 18 · Firma Klein Zügner Gbr c/o Eilbacher",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1018,
+  "name": "Großwallstadt, Quellenstr. 5 · Main Immo Team GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1019,
+  "name": "Wörth am Main, Landstr. 78 · Erbengemeinschaft Wolf",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1020,
+  "name": "Elsenfeld, Hoffeldstraße 39 · Main Immo Team GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1021,
+  "name": "Elsenfeld, Finkenweg 14 · Immobilien Hausverwaltung Schulz GmbH",
+  "taetigkeit": "Hausmeister"
+ },
+ {
+  "nr": 1022,
+  "name": "Elsendelf, Droselweg 17 · Immobilien Hausverwaltung Schultz GmbH",
+  "taetigkeit": "Hausmeister"
+ }
+];
+
 function mbushListenObjekteve(){
   var sel=document.getElementById('obj-lista');
   if(!sel) return;
   var p=[];
   try{p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');}catch(e){p=[];}
+  if(!p || !p.length){ p=OBJEKTET_BRENDA; }
   p.sort(function(a,b){return (a.nr||0)-(b.nr||0);});
   var html='<option value="">— Zgjidh objektin —</option>';
   for(var i=0;i<p.length;i++){
@@ -737,6 +855,7 @@ function kerkoObj(nr){
   var taet=ni>=1001&&ni<=2000?'Hausmeister':'';
   try{
     var p=JSON.parse(localStorage.getItem(KEY_PR)||'[]');
+    if(!p || !p.length){ p=OBJEKTET_BRENDA; }
     var g=p.find(function(x){return x.nr==ni;});
     if(g){
       document.getElementById('obj-bez').value=g.name;
@@ -783,6 +902,68 @@ function perditesoObjekteLista(){
 // ═══════════════════════════════════════════
 //  RUAJ HYRJEN
 // ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+//  PLANI IM — planifikimi_web.json nga PC-ja
+// ═══════════════════════════════════════════
+var KEY_PL = 'fth_plan';
+
+function shfaqPlanin(){
+  var el=document.getElementById('plani-im');
+  if(!el.classList.contains('hide')){ el.classList.add('hide'); return; }
+
+  var plan=null;
+  try{ plan=JSON.parse(localStorage.getItem(KEY_PL)||'null'); }catch(e){ plan=null; }
+
+  if(!plan || !plan[gPunetor]){
+    el.innerHTML='<div style="font-size:.82rem;color:var(--gray)">Nuk ka plan për ty.\n\nNë PC: Planifikimi → Eksporto për Celular → ngjit këtu:</div>'+
+      '<textarea id="plan-ngjit" rows="4" style="width:100%;margin-top:8px;font-size:.7rem;font-family:monospace;background:#0d0d1a;color:#e8e8f0;border:1px solid #2a2a50;border-radius:8px;padding:8px"></textarea>'+
+      '<button class="btn btn-cyan" onclick="importoPlanin()" style="margin-top:8px">📥 Ngarko Planin</button>'+
+      '<div class="status" id="st-plan"></div>';
+    el.classList.remove('hide');
+    return;
+  }
+
+  var ditet=plan[gPunetor];
+  var celsat=Object.keys(ditet).sort(function(a,b){
+    var x=a.split('.'),y=b.split('.');
+    return new Date(x[2],x[1]-1,x[0])-new Date(y[2],y[1]-1,y[0]);
+  });
+  if(!celsat.length){
+    el.innerHTML='<div style="font-size:.82rem;color:var(--gray)">Plani është bosh për ty.</div>';
+    el.classList.remove('hide'); return;
+  }
+  var html='<div style="font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:8px">📅 Plani Im</div>';
+  for(var i=0;i<celsat.length;i++){
+    var d=celsat[i], v=ditet[d];
+    var teksti='';
+    if(typeof v==='string'){ teksti=v; }
+    else if(v && v.length){
+      teksti=v.map(function(x){ return (x.projekt||'')+(x.shen?' · '+x.shen:''); }).join(' | ');
+    }
+    var emri=teksti.toLowerCase();
+    var ngjyr = emri.indexOf('urlaub')>=0 ? '#E74C3C' : (emri.indexOf('krank')>=0 ? '#E74C3C' : '#27AE60');
+    html+='<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #2a2a50">'+
+      '<span style="min-width:88px;font-weight:700;color:'+ngjyr+'">'+d+'</span>'+
+      '<span style="flex:1;font-size:.84rem">'+(teksti||'—')+'</span></div>';
+  }
+  el.innerHTML=html;
+  el.classList.remove('hide');
+}
+
+function importoPlanin(){
+  var txt=document.getElementById('plan-ngjit');
+  if(!txt) return;
+  try{
+    var d=JSON.parse(txt.value);
+    localStorage.setItem(KEY_PL, JSON.stringify(d));
+    document.getElementById('st-plan').textContent='✔ Plani u ngarkua!';
+    setTimeout(function(){ document.getElementById('plani-im').classList.add('hide'); }, 900);
+  }catch(e){
+    document.getElementById('st-plan').textContent='⚠ JSON i gabuar';
+  }
+}
+
 function ruajHyrjen(){
   if(!gPunetor){shfaqSt('st-ruaj','⚠ Nuk je i kyçur!','gabim');return;}
   var datumRaw=document.getElementById('inp-datum').value;
