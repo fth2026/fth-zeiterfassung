@@ -1,112 +1,163 @@
-﻿[
-    {
-        "nr":  1001,
-        "name":  "Reinigung wie nach Plan",
-        "klient":  "Kindertageseinrichtung Sonnenschein"
-    },
-    {
-        "nr":  1002,
-        "name":  "Röllfeld, Steigweg 1",
-        "klient":  "Gies Immobilien GmbH"
-    },
-    {
-        "nr":  1003,
-        "name":  "Wörth am Main, Galgenstr. 6",
-        "klient":  "Praxis Dr. Plattner Dr. Vogel Dr. Ide"
-    },
-    {
-        "nr":  1004,
-        "name":  "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a",
-        "klient":  "PETERS GmbH"
-    },
-    {
-        "nr":  1005,
-        "name":  "Laudenbach, Mühlweg 51",
-        "klient":  "Gies Immobilien GmbH"
-    },
-    {
-        "nr":  1006,
-        "name":  "Obernburg, Obere Wallstr. 17-19",
-        "klient":  "AB-Hausverwaltung Wolf"
-    },
-    {
-        "nr":  1007,
-        "name":  "Klingenberg, Wilhelmstr. 63",
-        "klient":  "Markus Krall"
-    },
-    {
-        "nr":  1008,
-        "name":  "Wörth am Main, Beethovenstr. 2b",
-        "klient":  "Vereinigte Schiffs-Versicherung V.A.G"
-    },
-    {
-        "nr":  1009,
-        "name":  "Wörth am Main, Frühlingsstr. 13a - 13b",
-        "klient":  "Eva Schroll"
-    },
-    {
-        "nr":  1010,
-        "name":  "Wörth am Main, Moosgraben 25",
-        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
-    },
-    {
-        "nr":  1011,
-        "name":  "Wörth am Main, Odenwaldstr. 30",
-        "klient":  "Ulrich Möller"
-    },
-    {
-        "nr":  1012,
-        "name":  "Haibach, Ludwigstr. 11",
-        "klient":  "Dieter Zang"
-    },
-    {
-        "nr":  1013,
-        "name":  "Wörth am Main, Presentstr. 19",
-        "klient":  "algeb awell GmbH"
-    },
-    {
-        "nr":  1014,
-        "name":  "Kleinheubach, Kastellstr. 11a",
-        "klient":  "Main Immo Team GmbH"
-    },
-    {
-        "nr":  1015,
-        "name":  "Wörth am Main, Erlenstr. 9",
-        "klient":  "Ismail Sezer"
-    },
-    {
-        "nr":  1016,
-        "name":  "Kleinheubach, Jahnstr. 17",
-        "klient":  "WEG Jahnstr. 17 c/o Perfect Living"
-    },
-    {
-        "nr":  1017,
-        "name":  "Wörth am Main, Presentstr. 18",
-        "klient":  "Firma Klein Zügner Gbr c/o Eilbacher"
-    },
-    {
-        "nr":  1018,
-        "name":  "Großwallstadt, Quellenstr. 5",
-        "klient":  "Main Immo Team GmbH"
-    },
-    {
-        "nr":  1019,
-        "name":  "Wörth am Main, Landstr. 78",
-        "klient":  "Erbengemeinschaft Wolf"
-    },
-    {
-        "nr":  1020,
-        "name":  "Elsenfeld, Hoffeldstraße 39",
-        "klient":  "Main Immo Team GmbH"
-    },
-    {
-        "nr":  1021,
-        "name":  "Elsenfeld, Finkenweg 14",
-        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
-    },
-    {
-        "nr":  1022,
-        "name":  "Elsendelf, Droselweg 17",
-        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
-    }
+[
+  {
+    "nr": 1001,
+    "name": "Reinigung wie nach Plan",
+    "klient": "4",
+    "kunden_nr": "4",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1002,
+    "name": "Röllfeld, Steigweg 1",
+    "klient": "8",
+    "kunden_nr": "8",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1003,
+    "name": "Wörth am Main, Galgenstr. 6",
+    "klient": "35",
+    "kunden_nr": "35",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1004,
+    "name": "Hausmeistertätigkeiten für Objekte in Erlenbach a. Main, Dürerstr. 1, \nMozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a",
+    "klient": "37",
+    "kunden_nr": "37",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1005,
+    "name": "Laudenbach, Mühlweg 51",
+    "klient": "8",
+    "kunden_nr": "8",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1006,
+    "name": "Obernburg, Obere Wallstr. 17-19",
+    "klient": "59",
+    "kunden_nr": "59",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1007,
+    "name": "Klingenberg, Wilhelmstr. 63",
+    "klient": "63",
+    "kunden_nr": "63",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1008,
+    "name": "Wörth am Main, Beethovenstr.2b",
+    "klient": "68",
+    "kunden_nr": "68",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1009,
+    "name": "Wörth am Main, Frühlingsstr. 13a - 13b",
+    "klient": "78",
+    "kunden_nr": "78",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1010,
+    "name": "Wörth am Main, Moosgraben 25",
+    "klient": "109",
+    "kunden_nr": "109",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1011,
+    "name": "Wörth am Main, Odenwaldstr. 30",
+    "klient": "85",
+    "kunden_nr": "85",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1012,
+    "name": "Haibach, Ludwigstr.11",
+    "klient": "38",
+    "kunden_nr": "38",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1013,
+    "name": "Wörth am Main, Presentstr. 19",
+    "klient": "99",
+    "kunden_nr": "99",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1014,
+    "name": "Kleinheubach, Kastellstr. 11a",
+    "klient": "100",
+    "kunden_nr": "100",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1015,
+    "name": "Wörth am Main, Erlenstr. 9",
+    "klient": "101",
+    "kunden_nr": "101",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1016,
+    "name": "Kleinheubach, Jahnstr. 17",
+    "klient": "104",
+    "kunden_nr": "104",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1017,
+    "name": "Wörth am Main, Presentstr. 18",
+    "klient": "20",
+    "kunden_nr": "20",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1018,
+    "name": "Großwallstadt, Quellenstr. 5",
+    "klient": "100",
+    "kunden_nr": "100",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1019,
+    "name": "Wörth am Main, Landstr. 78",
+    "klient": "94",
+    "kunden_nr": "94",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1020,
+    "name": "Elsenfeld, Hoffeldstraße 39",
+    "klient": "100",
+    "kunden_nr": "100",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1021,
+    "name": "Elsenfeld, Finkenweg 14",
+    "klient": "109",
+    "kunden_nr": "109",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1022,
+    "name": "Elsendelf, Droselweg 17",
+    "klient": "109",
+    "kunden_nr": "109",
+    "taetigkeit": "Hausmeister"
+  },
+  {
+    "nr": 1023,
+    "name": "Musterstadt, Hauptstr. 5",
+    "klient": "121",
+    "kunden_nr": "121",
+    "taetigkeit": "Hausmeister"
+  }
 ]
