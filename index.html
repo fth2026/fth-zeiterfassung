@@ -98,9 +98,9 @@ button.red{background:var(--red);color:#fff} button.gray{background:#3a3a5a;colo
     <label>Punëtori:</label>
     <input id="punetori" readonly>
 
-    <label>Objekt Nr. (1001–1022):</label>
+    <label>Objekti:</label>
     <div class="rresht">
-      <input id="nr-dore" inputmode="numeric" placeholder="p.sh. 1005">
+      <select id="zgjedh-obj"><option value="">— Zgjidh objektin —</option></select>
       <button class="gold" style="width:auto;padding:13px 18px;margin:0" onclick="filloMeNumer()">▶ Nis</button>
     </div>
 
@@ -193,7 +193,7 @@ function ngarkoPunetoret(){
 function ngarkoObjektet(){
   fetch(URL_OBJEKTET + "?t=" + Date.now())
     .then(function(r){ return r.json(); })
-    .then(function(d){ OBJEKTET = (d && d.length) ? d : []; })
+    .then(function(d){ OBJEKTET = (d && d.length) ? d : []; mbushObjektet(); })
     .catch(function(){ OBJEKTET = []; });
 }
 
@@ -322,11 +322,23 @@ function filloObjektin(teksti){
   merrHyrjet(); mbushListen(); vizato();
   st.textContent = "✔ "+o.nr+" · "+o.name;
 }
+function mbushObjektet(){
+  var s = document.getElementById("zgjedh-obj");
+  if(!s) return;
+  var h = '\u2014 Zgjidh objektin \u2014';
+  h = '<option value="">\u2014 Zgjidh objektin \u2014</option>';
+  for(var i=0;i<OBJEKTET.length;i++){
+    var o = OBJEKTET[i];
+    h += '<option value="'+o.nr+'">'+o.nr+' \u00b7 '+(o.name||"")+' \u00b7 '+(o.klient||"")+'</option>';
+  }
+  s.innerHTML = h;
+}
 function filloMeNumer(){
-  var v = document.getElementById("nr-dore").value;
-  if(!v) return;
+  var s = document.getElementById("zgjedh-obj");
+  var v = s ? s.value : "";
+  if(!v){ document.getElementById("st-skan").textContent = "\u26a0 Zgjidh objektin nga lista"; return; }
   filloObjektin(v);
-  document.getElementById("nr-dore").value = "";
+  if(s) s.value = "";
 }
 function mbyllAktivin(pa_rifreskim){
   var t = teGjithaHyrjet();
@@ -440,6 +452,7 @@ function shkarko(teksti, emri, lloji){
 function nis(){
   try{ ngarkoPunetoret(); }catch(e){ mbushLogin(); }
   try{ ngarkoObjektet(); }catch(e){ OBJEKTET = []; }
+  try{ mbushObjektet(); }catch(e){ }
   merrHyrjet(); vizato();
 }
 if(document.readyState === "loading"){
