@@ -1,0 +1,112 @@
+﻿[
+    {
+        "nr":  1001,
+        "name":  "Reinigung wie nach Plan",
+        "klient":  "Kindertageseinrichtung Sonnenschein"
+    },
+    {
+        "nr":  1002,
+        "name":  "Röllfeld, Steigweg 1",
+        "klient":  "Gies Immobilien GmbH"
+    },
+    {
+        "nr":  1003,
+        "name":  "Wörth am Main, Galgenstr. 6",
+        "klient":  "Praxis Dr. Plattner Dr. Vogel Dr. Ide"
+    },
+    {
+        "nr":  1004,
+        "name":  "Erlenbach a. Main, Dürerstr. 1, Mozartstr. 2-4, Kettelerstr. 2b, Pestalozzistr. 1-1a",
+        "klient":  "PETERS GmbH"
+    },
+    {
+        "nr":  1005,
+        "name":  "Laudenbach, Mühlweg 51",
+        "klient":  "Gies Immobilien GmbH"
+    },
+    {
+        "nr":  1006,
+        "name":  "Obernburg, Obere Wallstr. 17-19",
+        "klient":  "AB-Hausverwaltung Wolf"
+    },
+    {
+        "nr":  1007,
+        "name":  "Klingenberg, Wilhelmstr. 63",
+        "klient":  "Markus Krall"
+    },
+    {
+        "nr":  1008,
+        "name":  "Wörth am Main, Beethovenstr. 2b",
+        "klient":  "Vereinigte Schiffs-Versicherung V.A.G"
+    },
+    {
+        "nr":  1009,
+        "name":  "Wörth am Main, Frühlingsstr. 13a - 13b",
+        "klient":  "Eva Schroll"
+    },
+    {
+        "nr":  1010,
+        "name":  "Wörth am Main, Moosgraben 25",
+        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
+    },
+    {
+        "nr":  1011,
+        "name":  "Wörth am Main, Odenwaldstr. 30",
+        "klient":  "Ulrich Möller"
+    },
+    {
+        "nr":  1012,
+        "name":  "Haibach, Ludwigstr. 11",
+        "klient":  "Dieter Zang"
+    },
+    {
+        "nr":  1013,
+        "name":  "Wörth am Main, Presentstr. 19",
+        "klient":  "algeb awell GmbH"
+    },
+    {
+        "nr":  1014,
+        "name":  "Kleinheubach, Kastellstr. 11a",
+        "klient":  "Main Immo Team GmbH"
+    },
+    {
+        "nr":  1015,
+        "name":  "Wörth am Main, Erlenstr. 9",
+        "klient":  "Ismail Sezer"
+    },
+    {
+        "nr":  1016,
+        "name":  "Kleinheubach, Jahnstr. 17",
+        "klient":  "WEG Jahnstr. 17 c/o Perfect Living"
+    },
+    {
+        "nr":  1017,
+        "name":  "Wörth am Main, Presentstr. 18",
+        "klient":  "Firma Klein Zügner Gbr c/o Eilbacher"
+    },
+    {
+        "nr":  1018,
+        "name":  "Großwallstadt, Quellenstr. 5",
+        "klient":  "Main Immo Team GmbH"
+    },
+    {
+        "nr":  1019,
+        "name":  "Wörth am Main, Landstr. 78",
+        "klient":  "Erbengemeinschaft Wolf"
+    },
+    {
+        "nr":  1020,
+        "name":  "Elsenfeld, Hoffeldstraße 39",
+        "klient":  "Main Immo Team GmbH"
+    },
+    {
+        "nr":  1021,
+        "name":  "Elsenfeld, Finkenweg 14",
+        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
+    },
+    {
+        "nr":  1022,
+        "name":  "Elsendelf, Droselweg 17",
+        "klient":  "Immobilien Hausverwaltung Schultz GmbH"
+    }
+]
